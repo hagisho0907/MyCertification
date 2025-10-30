@@ -98,6 +98,7 @@ export function startNewSession(progress: ExamProgress): ExamProgress {
     sessionNumber,
     startedAt: now,
     updatedAt: now,
+    lastPage: 1,
     questions: {},
   }
 
@@ -180,6 +181,25 @@ export function updateQuestionProgress(
   }
 }
 
+export function updateSessionPage(
+  examProgress: ExamProgress,
+  page: number
+): ExamProgress {
+  if (!examProgress.currentSession) return examProgress
+  const now = isoNow()
+  const updatedSession: SessionProgress = {
+    ...examProgress.currentSession,
+    updatedAt: now,
+    lastPage: page,
+  }
+
+  return {
+    ...examProgress,
+    updatedAt: now,
+    currentSession: updatedSession,
+  }
+}
+
 export function setReviewFlag(
   examProgress: ExamProgress,
   questionId: string,
@@ -218,10 +238,10 @@ export type CombinedStats = {
   cumulative: ProgressStats
 }
 
-const calculateSessionStats = (
+export function calculateSessionStats(
   session: SessionProgress | undefined,
   totalQuestions: number
-): ProgressStats | null => {
+): ProgressStats | null {
   if (!session) return null
   const values = Object.values(session.questions)
   const answeredCount = values.length

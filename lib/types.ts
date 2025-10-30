@@ -37,6 +37,7 @@ export type SessionProgress = {
   startedAt: string
   updatedAt: string
   completedAt?: string
+  lastPage: number
   questions: Record<string, SessionQuestionProgress>
 }
 

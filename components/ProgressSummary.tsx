@@ -8,6 +8,7 @@ interface ProgressSummaryProps {
   examProgress: ExamProgress
   totalQuestions: number
   onStartNewSession?: () => void
+  onResumeSession?: () => void
   onCompleteSession?: () => void
 }
 
@@ -15,9 +16,11 @@ export default function ProgressSummary({
   examProgress,
   totalQuestions,
   onStartNewSession,
+  onResumeSession,
   onCompleteSession,
 }: ProgressSummaryProps) {
   const { session, cumulative } = calculateStats(examProgress, totalQuestions)
+  const hasActiveSession = Boolean(examProgress.currentSession)
   
   const handleReset = () => {
     if (confirm('学習履歴をリセットしますか？この操作は取り消せません。')) {
@@ -61,7 +64,7 @@ export default function ProgressSummary({
         </div>
       </div>
       
-      {onStartNewSession && (
+      {onStartNewSession && !hasActiveSession && (
         <button
           onClick={onStartNewSession}
           className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
@@ -71,7 +74,17 @@ export default function ProgressSummary({
         </button>
       )}
 
-      {onCompleteSession && examProgress.currentSession && (
+      {onResumeSession && hasActiveSession && (
+        <button
+          onClick={onResumeSession}
+          className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
+          title="セッションを再開"
+        >
+          <PlayIcon className="w-5 h-5" />
+        </button>
+      )}
+
+      {onCompleteSession && hasActiveSession && (
         <button
           onClick={onCompleteSession}
           className="p-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100"
