@@ -96,6 +96,7 @@ type SessionQuestionProgress = {
   answeredAt: string;      // ISO8601
   attempts: number;
   correctAttempts: number;
+  selectedChoiceIds: string[];
 };
 
 type SessionProgress = {
@@ -129,6 +130,7 @@ type ExamProgress = {
 - 振る舞い
   - 「第 n 回目の学習を開始」で `currentSession` を初期化し、`sessionNumber` は `nextSessionNumber` を割り当てる。開始時点で `lastPage = 1` を設定。
   - 回答確定時に `currentSession.questions[questionId]` と `cumulative[questionId]` を同時に更新する。解説表示後は UI 側で選択状態をクリアするが、セッション内の `attempts` は増える。
+    - `selectedChoiceIds` に最後に選択した選択肢 ID を保存し、セッション履歴モーダルで解答内容を再現できるようにする。
   - 復習フラグ操作は `cumulative[questionId].isFlaggedForReview` を更新する（セッションを跨いで維持）。
   - ページ遷移のたびに `currentSession.lastPage` を更新し、途中から「再開」した際に該当ページへ遷移できるようにする。
   - セッション終了時は `currentSession.completedAt` を設定し、`sessionHistory` の先頭に追加、`currentSession` を未定義化、`nextSessionNumber` をインクリメント。

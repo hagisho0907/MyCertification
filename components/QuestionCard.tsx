@@ -71,12 +71,10 @@ export default function QuestionCard({
     setIsAnswered(true)
     setShowExplanation(true)
     
-    const updatedProgress = updateQuestionProgress(
-      examProgress,
-      question.id,
-      isCorrectAnswer ? 'correct' : 'incorrect',
-      isCorrectAnswer ? false : true
-    )
+    const updatedProgress = updateQuestionProgress(examProgress, question.id, isCorrectAnswer ? 'correct' : 'incorrect', {
+      selectedChoiceIds: Array.from(selected),
+      forceFlag: isCorrectAnswer ? false : true,
+    })
     
     saveExamProgress(updatedProgress)
     onProgressUpdate(updatedProgress)

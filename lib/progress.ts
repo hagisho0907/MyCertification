@@ -131,16 +131,23 @@ export function completeCurrentSession(progress: ExamProgress): ExamProgress {
   }
 }
 
+type UpdateQuestionOptions = {
+  selectedChoiceIds?: string[]
+  forceFlag?: boolean
+}
+
 export function updateQuestionProgress(
   examProgress: ExamProgress,
   questionId: string,
   result: 'correct' | 'incorrect',
-  forceFlag?: boolean
+  options: UpdateQuestionOptions = {}
 ): ExamProgress {
   const now = isoNow()
   const progressWithSession = ensureActiveSession(examProgress)
   const currentSession = progressWithSession.currentSession!
   const existingSessionQuestion = currentSession.questions[questionId]
+  const selectedChoiceIds =
+    options.selectedChoiceIds ?? existingSessionQuestion?.selectedChoiceIds ?? []
 
   const updatedSessionQuestion: SessionQuestionProgress = {
     lastResult: result,
@@ -148,6 +155,7 @@ export function updateQuestionProgress(
     attempts: (existingSessionQuestion?.attempts ?? 0) + 1,
     correctAttempts:
       (existingSessionQuestion?.correctAttempts ?? 0) + (result === 'correct' ? 1 : 0),
+    selectedChoiceIds,
   }
 
   const existingCumulative =
@@ -159,8 +167,8 @@ export function updateQuestionProgress(
     totalAttempts: existingCumulative.totalAttempts + 1,
     totalCorrect: existingCumulative.totalCorrect + (result === 'correct' ? 1 : 0),
     isFlaggedForReview:
-      forceFlag !== undefined
-        ? forceFlag
+      options.forceFlag !== undefined
+        ? options.forceFlag
         : result === 'incorrect'
         ? true
         : existingCumulative.isFlaggedForReview,

@@ -30,6 +30,7 @@ export type SessionQuestionProgress = {
   answeredAt: string
   attempts: number
   correctAttempts: number
+  selectedChoiceIds: string[]
 }
 
 export type SessionProgress = {

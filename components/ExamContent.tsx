@@ -250,6 +250,7 @@ export default function ExamContent() {
         <SessionHistoryList
           sessionHistory={examProgress.sessionHistory}
           totalQuestions={examData.meta.totalQuestions}
+          questions={examData.questions}
         />
       </main>
     </div>
