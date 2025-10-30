@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { calculateStats, getExamProgress } from '@/lib/progress'
 import examData from './data/sample.json'
 import StatsCards from '@/components/StatsCards'
 

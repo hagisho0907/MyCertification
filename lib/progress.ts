@@ -1,17 +1,69 @@
 'use client'
 
-import { ExamProgress, QuestionProgress } from './types'
+import {
+  ExamProgress,
+  SessionProgress,
+  SessionQuestionProgress,
+  CumulativeQuestionProgress,
+} from './types'
 
 const STORAGE_KEY_PREFIX = 'mycert-progress-'
 
+const isoNow = () => new Date().toISOString()
+
+const createEmptyCumulative = (): CumulativeQuestionProgress => ({
+  lastResult: 'unanswered',
+  totalAttempts: 0,
+  totalCorrect: 0,
+  isFlaggedForReview: false,
+})
+
+const cloneSessionWithQuestion = (
+  session: SessionProgress,
+  questionId: string,
+  questionProgress: SessionQuestionProgress
+): SessionProgress => ({
+  ...session,
+  updatedAt: isoNow(),
+  questions: {
+    ...session.questions,
+    [questionId]: questionProgress,
+  },
+})
+
+const finalizeSession = (session: SessionProgress): SessionProgress => {
+  const now = isoNow()
+  return {
+    ...session,
+    updatedAt: now,
+    completedAt: session.completedAt ?? now,
+  }
+}
+
+const isProgressV2 = (data: unknown): data is ExamProgress => {
+  if (!data || typeof data !== 'object') return false
+  const progress = data as Partial<ExamProgress>
+  return (
+    typeof progress.examId === 'string' &&
+    typeof progress.version === 'string' &&
+    typeof progress.nextSessionNumber === 'number' &&
+    Array.isArray(progress.sessionHistory) &&
+    progress.cumulative !== undefined
+  )
+}
+
 export function getExamProgress(examId: string): ExamProgress | null {
   if (typeof window === 'undefined') return null
-  
+
   const stored = localStorage.getItem(`${STORAGE_KEY_PREFIX}${examId}`)
   if (!stored) return null
-  
+
   try {
-    return JSON.parse(stored) as ExamProgress
+    const parsed = JSON.parse(stored)
+    if (!isProgressV2(parsed)) {
+      return null
+    }
+    return parsed as ExamProgress
   } catch {
     return null
   }
@@ -19,7 +71,7 @@ export function getExamProgress(examId: string): ExamProgress | null {
 
 export function saveExamProgress(progress: ExamProgress): void {
   if (typeof window === 'undefined') return
-  
+
   localStorage.setItem(
     `${STORAGE_KEY_PREFIX}${progress.examId}`,
     JSON.stringify(progress)
@@ -27,11 +79,54 @@ export function saveExamProgress(progress: ExamProgress): void {
 }
 
 export function createInitialProgress(examId: string, version: string): ExamProgress {
+  const now = isoNow()
   return {
     examId,
     version,
-    updatedAt: new Date().toISOString(),
-    questions: {}
+    updatedAt: now,
+    nextSessionNumber: 1,
+    currentSession: undefined,
+    sessionHistory: [],
+    cumulative: {},
+  }
+}
+
+export function startNewSession(progress: ExamProgress): ExamProgress {
+  const now = isoNow()
+  const sessionNumber = progress.nextSessionNumber
+  const newSession: SessionProgress = {
+    sessionNumber,
+    startedAt: now,
+    updatedAt: now,
+    questions: {},
+  }
+
+  const history = progress.currentSession
+    ? [finalizeSession(progress.currentSession), ...progress.sessionHistory]
+    : progress.sessionHistory
+
+  return {
+    ...progress,
+    updatedAt: now,
+    currentSession: newSession,
+    sessionHistory: history,
+    nextSessionNumber: sessionNumber + 1,
+  }
+}
+
+export function ensureActiveSession(progress: ExamProgress): ExamProgress {
+  if (progress.currentSession) return progress
+  return startNewSession(progress)
+}
+
+export function completeCurrentSession(progress: ExamProgress): ExamProgress {
+  if (!progress.currentSession) return progress
+  const completed = finalizeSession(progress.currentSession)
+  return {
+    ...progress,
+    updatedAt: isoNow(),
+    currentSession: undefined,
+    sessionHistory: [completed, ...progress.sessionHistory],
   }
 }
 
@@ -39,53 +134,155 @@ export function updateQuestionProgress(
   examProgress: ExamProgress,
   questionId: string,
   result: 'correct' | 'incorrect',
-  isFlaggedForReview?: boolean
+  forceFlag?: boolean
 ): ExamProgress {
-  const existing = examProgress.questions[questionId] || {
-    lastResult: 'unanswered',
-    attempts: 0,
-    correctAttempts: 0,
-    isFlaggedForReview: false
-  }
-  
-  const updated: QuestionProgress = {
+  const now = isoNow()
+  const progressWithSession = ensureActiveSession(examProgress)
+  const currentSession = progressWithSession.currentSession!
+  const existingSessionQuestion = currentSession.questions[questionId]
+
+  const updatedSessionQuestion: SessionQuestionProgress = {
     lastResult: result,
-    answeredAt: new Date().toISOString(),
-    attempts: existing.attempts + 1,
-    correctAttempts: existing.correctAttempts + (result === 'correct' ? 1 : 0),
-    isFlaggedForReview: isFlaggedForReview !== undefined ? isFlaggedForReview : existing.isFlaggedForReview
+    answeredAt: now,
+    attempts: (existingSessionQuestion?.attempts ?? 0) + 1,
+    correctAttempts:
+      (existingSessionQuestion?.correctAttempts ?? 0) + (result === 'correct' ? 1 : 0),
   }
-  
+
+  const existingCumulative =
+    progressWithSession.cumulative[questionId] ?? createEmptyCumulative()
+
+  const updatedCumulative: CumulativeQuestionProgress = {
+    lastResult: result,
+    lastAnsweredAt: now,
+    totalAttempts: existingCumulative.totalAttempts + 1,
+    totalCorrect: existingCumulative.totalCorrect + (result === 'correct' ? 1 : 0),
+    isFlaggedForReview:
+      forceFlag !== undefined
+        ? forceFlag
+        : result === 'incorrect'
+        ? true
+        : existingCumulative.isFlaggedForReview,
+  }
+
   return {
-    ...examProgress,
-    updatedAt: new Date().toISOString(),
-    questions: {
-      ...examProgress.questions,
-      [questionId]: updated
-    }
+    ...progressWithSession,
+    updatedAt: now,
+    currentSession: cloneSessionWithQuestion(
+      currentSession,
+      questionId,
+      updatedSessionQuestion
+    ),
+    cumulative: {
+      ...progressWithSession.cumulative,
+      [questionId]: updatedCumulative,
+    },
   }
 }
 
-export function calculateStats(examProgress: ExamProgress, totalQuestions: number) {
-  const questions = Object.values(examProgress.questions)
-  const answered = questions.filter(q => q.lastResult !== 'unanswered')
-  const correct = answered.filter(q => q.lastResult === 'correct')
-  const flagged = questions.filter(q => q.isFlaggedForReview)
-  const incorrect = answered.filter(q => q.lastResult === 'incorrect')
-  
+export function setReviewFlag(
+  examProgress: ExamProgress,
+  questionId: string,
+  isFlagged: boolean
+): ExamProgress {
+  const now = isoNow()
+  const existing = examProgress.cumulative[questionId] ?? createEmptyCumulative()
   return {
-    totalQuestions,
-    answeredCount: answered.length,
-    correctCount: correct.length,
-    incorrectCount: incorrect.length,
-    unansweredCount: totalQuestions - answered.length,
-    flaggedCount: flagged.length,
-    correctRate: answered.length > 0 ? (correct.length / answered.length) * 100 : 0
+    ...examProgress,
+    updatedAt: now,
+    cumulative: {
+      ...examProgress.cumulative,
+      [questionId]: {
+        ...existing,
+        lastResult: existing.lastResult,
+        lastAnsweredAt: existing.lastAnsweredAt,
+        totalAttempts: existing.totalAttempts,
+        totalCorrect: existing.totalCorrect,
+        isFlaggedForReview: isFlagged,
+      },
+    },
+  }
+}
+
+export type ProgressStats = {
+  answeredCount: number
+  correctCount: number
+  incorrectCount: number
+  unansweredCount: number
+  flaggedCount: number
+  correctRate: number
+}
+
+export type CombinedStats = {
+  session: ProgressStats | null
+  cumulative: ProgressStats
+}
+
+const calculateSessionStats = (
+  session: SessionProgress | undefined,
+  totalQuestions: number
+): ProgressStats | null => {
+  if (!session) return null
+  const values = Object.values(session.questions)
+  const answeredCount = values.length
+  const correctCount = values.filter((q) => q.lastResult === 'correct').length
+  const incorrectCount = values.filter((q) => q.lastResult === 'incorrect').length
+  const unansweredCount = Math.max(totalQuestions - answeredCount, 0)
+  const flaggedCount = incorrectCount
+  const correctRate = answeredCount > 0 ? (correctCount / answeredCount) * 100 : 0
+
+  return {
+    answeredCount,
+    correctCount,
+    incorrectCount,
+    unansweredCount,
+    flaggedCount,
+    correctRate,
+  }
+}
+
+const calculateCumulativeStats = (
+  cumulative: Record<string, CumulativeQuestionProgress>,
+  totalQuestions: number
+): ProgressStats => {
+  const values = Object.values(cumulative)
+  const answeredValues = values.filter((q) => q.totalAttempts > 0)
+  const answeredCount = answeredValues.length
+  const correctCount = answeredValues.filter((q) => q.lastResult === 'correct').length
+  const incorrectCount = answeredValues.filter((q) => q.lastResult === 'incorrect').length
+  const unansweredCount = Math.max(totalQuestions - answeredCount, 0)
+  const flaggedCount = values.filter((q) => q.isFlaggedForReview).length
+  const totalAttempts = values.reduce((sum, q) => sum + q.totalAttempts, 0)
+  const totalCorrect = values.reduce((sum, q) => sum + q.totalCorrect, 0)
+  const correctRate = totalAttempts > 0 ? (totalCorrect / totalAttempts) * 100 : 0
+
+  return {
+    answeredCount,
+    correctCount,
+    incorrectCount,
+    unansweredCount,
+    flaggedCount,
+    correctRate,
+  }
+}
+
+export function calculateStats(
+  examProgress: ExamProgress,
+  totalQuestions: number
+): CombinedStats {
+  return {
+    session: calculateSessionStats(examProgress.currentSession, totalQuestions),
+    cumulative: calculateCumulativeStats(examProgress.cumulative, totalQuestions),
   }
 }
 
 export function clearExamProgress(examId: string): void {
   if (typeof window === 'undefined') return
-  
   localStorage.removeItem(`${STORAGE_KEY_PREFIX}${examId}`)
+}
+
+export function getReviewQuestionIds(progress: ExamProgress): string[] {
+  return Object.entries(progress.cumulative)
+    .filter(([_, value]) => value.isFlaggedForReview || value.lastResult === 'incorrect')
+    .map(([questionId]) => questionId)
 }

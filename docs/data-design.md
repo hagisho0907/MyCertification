@@ -91,11 +91,26 @@ export type ExamData = {
 - データ構造
 
 ```ts
-type QuestionProgress = {
-  lastResult: "correct" | "incorrect" | "unanswered";
-  answeredAt?: string;           // ISO8601
+type SessionQuestionProgress = {
+  lastResult: "correct" | "incorrect";
+  answeredAt: string;      // ISO8601
   attempts: number;
   correctAttempts: number;
+};
+
+type SessionProgress = {
+  sessionNumber: number;
+  startedAt: string;
+  updatedAt: string;
+  completedAt?: string;
+  questions: Record<string, SessionQuestionProgress>;
+};
+
+type CumulativeQuestionProgress = {
+  lastResult: "correct" | "incorrect" | "unanswered";
+  lastAnsweredAt?: string;
+  totalAttempts: number;
+  totalCorrect: number;
   isFlaggedForReview: boolean;
 };
 
@@ -103,20 +118,26 @@ type ExamProgress = {
   examId: string;
   version: string;
   updatedAt: string;
-  questions: Record<string, QuestionProgress>;
+  nextSessionNumber: number;         // 次に開始するセッション番号
+  currentSession?: SessionProgress;  // 進行中セッション
+  sessionHistory: SessionProgress[]; // 完了済みセッション（最新が先頭）
+  cumulative: Record<string, CumulativeQuestionProgress>;
 };
 ```
 
 - 振る舞い
-  - 回答確定時に `questions[questionId]` を更新。
-  - 復習フラグ操作で `isFlaggedForReview` を切り替え。
+  - 「第 n 回目の学習を開始」で `currentSession` を初期化し、`sessionNumber` は `nextSessionNumber` を割り当てる。
+  - 回答確定時に `currentSession.questions[questionId]` と `cumulative[questionId]` を同時に更新する。解説表示後は UI 側で選択状態をクリアするが、セッション内の `attempts` は増える。
+  - 復習フラグ操作は `cumulative[questionId].isFlaggedForReview` を更新する（セッションを跨いで維持）。
+  - セッション終了時は `currentSession.completedAt` を設定し、`sessionHistory` の先頭に追加、`currentSession` を未定義化、`nextSessionNumber` をインクリメント。
   - 「履歴リセット」で ExamProgress を初期化。
   - バージョンが変わった場合は互換性チェックを行い、必要なら自動リセット。
 
 ## 派生データ・計算ロジック
-- 正答率 = `correctAttempts / attempts` で算出。未回答は分母に含めない。
-- 復習対象数 = `isFlaggedForReview === true` または `lastResult === "incorrect"` の件数。
-- 未回答数 = `lastResult === "unanswered"` の件数。
+- 現在セッションの正答率 = `sum(correctAttempts) / sum(attempts)` （`currentSession` が存在する場合）。
+- 累積正答率 = `totalCorrect / totalAttempts`。
+- 復習対象数 = `cumulative` のうち `isFlaggedForReview === true` をカウント。
+- 未回答数（累積） = `totalQuestions -` `cumulative` で `lastResult !== "unanswered"` の件数。
 - ページング時の配列スライス: `questions.slice(pageIndex * 20, (pageIndex + 1) * 20)`
 
 ## ファイル・ディレクトリ構成（想定）
@@ -125,7 +146,7 @@ MyCertification/
 ├── docs/
 │   └── ... (本ドキュメント)
 ├── scripts/
-│   └── convert-excel-to-json.ts   # 変換スクリプト（今後作成）
+│   └── convert-csv-to-json.ts     # 変換スクリプト（今後作成）
 ├── src/
 │   ├── data/
 │   │   └── aws-devops-pro.json    # 生成物

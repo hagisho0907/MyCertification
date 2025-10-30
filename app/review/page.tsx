@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import examData from '@/app/data/sample.json'
 import QuestionCard from '@/components/QuestionCard'
-import { getExamProgress } from '@/lib/progress'
+import { getExamProgress, getReviewQuestionIds, ensureActiveSession, saveExamProgress } from '@/lib/progress'
 import { ExamProgress, Question } from '@/lib/types'
 
 export default function ReviewPage() {
@@ -13,25 +13,27 @@ export default function ReviewPage() {
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([])
   
   useEffect(() => {
-    const progress = getExamProgress(examData.examId)
+    let progress = getExamProgress(examData.examId)
     if (!progress) {
       router.push('/')
       return
     }
-    
+    if (!progress.currentSession) {
+      progress = ensureActiveSession(progress)
+      saveExamProgress(progress)
+    }
     setExamProgress(progress)
     
-    // Filter questions that are flagged for review or incorrect
-    const questionsToReview = examData.questions.filter(question => {
-      const progressData = progress.questions[question.id]
-      return progressData && (
-        progressData.isFlaggedForReview || 
-        progressData.lastResult === 'incorrect'
-      )
-    })
-    
-    setReviewQuestions(questionsToReview)
   }, [router])
+
+  useEffect(() => {
+    if (!examProgress) return
+    const reviewTargetIds = new Set(getReviewQuestionIds(examProgress))
+    const questionsToReview = examData.questions.filter((question) =>
+      reviewTargetIds.has(question.id)
+    )
+    setReviewQuestions(questionsToReview)
+  }, [examProgress])
 
   if (!examProgress) return null
 

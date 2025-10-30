@@ -1,8 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Question, ExamProgress } from '@/lib/types'
-import { updateQuestionProgress, saveExamProgress } from '@/lib/progress'
+import {
+  updateQuestionProgress,
+  saveExamProgress,
+  setReviewFlag,
+} from '@/lib/progress'
 import { CheckCircleIcon, XCircleIcon, FlagIcon } from '@heroicons/react/24/solid'
 import { FlagIcon as FlagOutlineIcon } from '@heroicons/react/24/outline'
 
@@ -24,16 +28,11 @@ export default function QuestionCard({
   const [showExplanation, setShowExplanation] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   
-  const progressData = examProgress.questions[question.id]
-  const isFlagged = progressData?.isFlaggedForReview || false
-
-  useEffect(() => {
-    if (progressData && progressData.lastResult !== 'unanswered') {
-      setIsAnswered(true)
-      setShowExplanation(true)
-      setIsCorrect(progressData.lastResult === 'correct')
-    }
-  }, [progressData])
+  const sessionQuestion = examProgress.currentSession?.questions[question.id]
+  const cumulativeQuestion = examProgress.cumulative[question.id]
+  const isFlagged = cumulativeQuestion?.isFlaggedForReview || false
+  const attempts = sessionQuestion?.attempts ?? 0
+  const latestResult = sessionQuestion?.lastResult
 
   const handleSingleChoice = (choiceId: string) => {
     if (isAnswered) return
@@ -84,34 +83,16 @@ export default function QuestionCard({
   }
 
   const toggleFlag = () => {
-    if (!progressData || progressData.lastResult === 'unanswered') {
-      // If not answered yet, just update the flag
-      const updatedProgress = {
-        ...examProgress,
-        updatedAt: new Date().toISOString(),
-        questions: {
-          ...examProgress.questions,
-          [question.id]: {
-            lastResult: 'unanswered' as const,
-            attempts: 0,
-            correctAttempts: 0,
-            isFlaggedForReview: !isFlagged
-          }
-        }
-      }
-      saveExamProgress(updatedProgress)
-      onProgressUpdate(updatedProgress)
-    } else {
-      // If already answered, update normally
-      const updatedProgress = updateQuestionProgress(
-        examProgress,
-        question.id,
-        progressData.lastResult,
-        !isFlagged
-      )
-      saveExamProgress(updatedProgress)
-      onProgressUpdate(updatedProgress)
-    }
+    const updatedProgress = setReviewFlag(examProgress, question.id, !isFlagged)
+    saveExamProgress(updatedProgress)
+    onProgressUpdate(updatedProgress)
+  }
+
+  const handleResetAnswer = () => {
+    setSelectedChoices(new Set())
+    setIsAnswered(false)
+    setShowExplanation(false)
+    setIsCorrect(false)
   }
 
   return (
@@ -119,7 +100,14 @@ export default function QuestionCard({
       isAnswered ? (isCorrect ? 'border-2 border-green-500' : 'border-2 border-red-500') : ''
     }`}>
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-lg font-semibold">Q{questionNumber}</h3>
+        <div>
+          <h3 className="text-lg font-semibold">Q{questionNumber}</h3>
+          {attempts > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              このセッションで {attempts} 回回答済み（直近: {latestResult === 'correct' ? '正解' : '不正解'})
+            </p>
+          )}
+        </div>
         <button
           onClick={toggleFlag}
           className="text-orange-500 hover:text-orange-600"
@@ -229,6 +217,17 @@ export default function QuestionCard({
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {isAnswered && (
+        <div className="mt-4">
+          <button
+            onClick={handleResetAnswer}
+            className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            解答をリセットして再挑戦する
+          </button>
         </div>
       )}
     </div>
