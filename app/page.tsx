@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import examData from './data/sample.json'
+import examData from './data/aws-devops-pro.json'
 import StatsCards from '@/components/StatsCards'
 
 export default function Home() {

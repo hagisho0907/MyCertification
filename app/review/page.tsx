@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import examData from '@/app/data/sample.json'
+import examData from '@/app/data/aws-devops-pro.json'
 import QuestionCard from '@/components/QuestionCard'
 import { getExamProgress, getReviewQuestionIds, ensureActiveSession, saveExamProgress } from '@/lib/progress'
 import { ExamProgress, Question } from '@/lib/types'

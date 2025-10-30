@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import examData from '@/app/data/sample.json'
+import examData from '@/app/data/aws-devops-pro.json'
 import SessionHistoryList from '@/components/SessionHistoryList'
 import { getExamProgress, removeSessionFromHistory, saveExamProgress } from '@/lib/progress'
 import { ExamProgress } from '@/lib/types'

@@ -1,0 +1,331 @@
+{
+  "examId": "aws-devops-pro",
+  "title": "AWS Certified DevOps Engineer - Professional",
+  "version": "2025-10",
+  "questions": [
+    {
+      "id": "DOP-C02-Q001",
+      "questionText": "ある企業には、Application Load Balancer (ALB) への HTTP API 呼び出しを行うモバイルアプリケーションがあります。ALB はリクエストを AWS Lambda 関数にルーティングします。特定の時点では、一部のユーザーによってテストされているバージョンも含め、アプリケーションのさまざまなバージョンが使用されています。アプリケーションのバージョンは、API へのすべてのリクエストと共に送信されるユーザーエージェントヘッダーで定義されます。 最近 API に一連の変更が加えられた後、企業はアプリケーションに問題があることを確認しました。企業は、使用中のアプリケーションのバージョンごとに、レスポンスコードによって各 API 操作のメトリクスを収集する必要があります。DevOps エンジニアは、ユーザーエージェントヘッダーとレスポンスコードから API 操作名、バージョン情報を抽出するために Lambda 関数を変更しました。必要 なメトリクスを収集するために、DevOps エンジニアはどのような追加のアクションセットを実行する必要がありますか?",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "Lambda 関数を変更し、API オペレーション名、レスポンスコード、バージョン番号を Amazon CloudWatch Logs ロググループにログ行として書き込むようにします。API オペレーション名ごとにメトリクスを増分する CloudWatch Logs メトリクスフィルターを設定します。メトリクスのディメンションとして、レスポンスコードとアプリケーションバージョンを指定します。",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "Lambda 関数を変更し、API オペレーション名、レスポンスコード、バージョン番号を Amazon CloudWatch Logs ロググループにログ行として書き込むようにします。ログ行から CloudWatch メトリクスを入力するように CloudWatch Logs Insights クエリを設定します。メトリクスのディメンションとして、レスポンスコードとアプリケーションバージョンを指定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "ALB アクセスログを Amazon CloudWatch Logs ロググループに書き込むように設定します。Lambda 関数を変更し、API オペレーション名、レスポンスコード、バージョン番号をレスポンスメタデータとして ALB に応答します。API オペレーション名ごとにメトリクスを増分する CloudWatch Logs メトリクスフィルターを設定します。メトリクスのディメンションとして、レスポンスコードとアプリケーションバージョンを指定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "Lambda関数にAWS X-Rayの統合を設定します。Lambda関数を変更し、APIオペレーション名、レスポンスコード、バージョン番号を含むX-Rayサブセグメントを作成します。X-Ray Insightsを設定して、APIオペレーション名ごとに集計されたメトリクスを抽出し、Amazon CloudWatchに公開します。メトリクスのディメンションとして、レスポンスコードとアプリケーションバージョンを指定します。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "A が正解です。\n目的は「API操作名 × レスポンスコード × アプリのバージョン」でメトリクスを切ること。\nLambdaでそれらをログに出し、CloudWatch Logs のメトリクスフィルターで抽出 → 指定した**ディメンション（レスポンスコードとバージョン）**付きでメトリクス化するのが定石。\n他が不適な理由:\nB: Logs Insights はクエリ用で、継続的なメトリクス発行の仕組みではない（定期クエリでの恒常的メトリクス化は想定外）。\nC: ALB アクセスログは通常 S3 で、CloudWatch Logs 直書き前提は不適。またレスポンスメタデータを ALB に戻してもログに都合よく出ない。\nD: X-Ray/Insights はトレースと異常検知が主眼で、ここで求める任意ディメンション付きメトリクス集計の手段としては不適。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q002",
+      "questionText": "ある企業が顧客にアプリケーションを提供しています。このアプリケーションには、AWS Lambda 関数を呼び出す Amazon API Gateway REST API があります。初期化時に、Lambda 関数は Amazon DynamoDB テーブルから大量のデータをロードします。データロードプロセスにより、8～10 秒の長いコールドスタート時間が発生します。DynamoDB テーブルには DynamoDB Accelerator (DAX) が設定されています。 顧客から、アプリケーションがリクエストに応答するのに断続的に長い時間がかかるとの報告があります。アプリケーションは 1 日を通して何千ものリクエストを受け取ります。日中には、アプリケーションは 1 日の他のどの時間帯よりも 10 倍多くのリクエストを経験します。1 日の終わり近くには、アプリケーションのリクエスト量は通常の合計の 10% に減少します。DevOps エンジニアは、1 日中いつでも Lambda 関数のレイテンシーを削減する必要があります。 どのソリューションがこれらの要件を満たすでしょうか。",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "同時実行値を 1 にして、Lambda 関数でプロビジョニングされた同時実行を設定します。DynamoDB テーブルの DAX クラスターを削除します。",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "同時実行値を 0 にして、Lambda 関数で予約された同時実行を設定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "Lambda関数でプロビジョニングされた同時実行性を設定します。Lambda関数でAWS Application Auto Scalingを設定し、プロビジョニングされた同時実行性の値を最小1、最大100に設定します。",
+          "isCorrect": true
+        },
+        {
+          "id": "D",
+          "text": "Lambda関数で予約同時実行数を設定します。API Gateway APIでAWS Application Auto Scalingを設定し、予約同時実行数の最大値を100に設定します。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "C が正解です。\nコールドスタートによるレイテンシを恒常的に抑えるには Provisioned Concurrency（プロビジョンド同時実行） が適切。関数の初期化を事前完了させ、呼び出し時の初期化待ちをなくします。\nさらに Application Auto Scaling でプロビジョンド同時実行数を時間帯に合わせてスケール（最小1〜最大100など）すれば、日中の高負荷でもコールドスタートを回避しつつ、深夜帯は過剰プロビジョニングを抑制できます。\n他の選択肢が不適な理由:\nA: プロビジョンド同時実行=1はピーク時に不足。DAX削除は無関係かつ逆効果の可能性。\nB: 予約同時実行=0は呼び出し不可。\nD: 予約同時実行は上限制御であり、ウォーム保持ではない。API Gateway側のスケーリング設定はLambdaのコールドスタート解消に直結しません。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q003",
+      "questionText": "ある企業は、Java-Apache TomcatアプリケーションとApache Webサーバーを連携させ、AWS CodeDeployを導入してアプリケーションのデプロイを自動化しています。開発チームは概念実証（PoC）から始め、開発環境用のデプロイメントグループを作成し、アプリケーション内で機能テストを実施しました。テスト完了後、チームはステージング環境と本番環境用のデプロイメントグループを追加作成する予定です。 現在のログレベルはApache設定内で設定されていますが、チームはデプロイメント時にこの設定を動的に変更したいと考えています。これにより、デプロイメントグループごとに異なるアプリケーションリビジョンを設定することなく、デプロイメントグループに応じて異なるログレベル設定が可能になります。 これらの要件を、最小限の管理オーバーヘッドで、かつデプロイメントグループごとに異なるスクリプトバージョンを必要とせずに満たすにはどうすればよいでしょうか？",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "デプロイメントグループに応じて Amazon EC2 インスタンスにタグを付けます。次に、メタデータサービスと EC2 API を呼び出してインスタンスが属するデプロイメントグループを識別するスクリプトをアプリケーションリビジョンに配置します。この情報を使用してログレベルの設定を構成します。appspec.yml ファイルの AfterInstall ライフサイクルフックの一部としてスクリプトを参照します。",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "CodeDeploy 環境変数 DEPLOYMENT_GROUP_ NAME を使用して、インスタンスが属するデプロイメントグループを識別するスクリプトを作成します。この情報を使用して、ログレベルの設定を構成します。このスクリプトは、appspec.yml ファイルの BeforeInstall ライフサイクルフックの一部として参照されます。",
+          "isCorrect": true
+        },
+        {
+          "id": "C",
+          "text": "各環境ごとにCodeDeployカスタム環境変数を作成します。次に、この環境変数をチェックしてインスタンスが属するデプロイメントグループを識別するスクリプトをアプリケーションのリビジョンに配置します。この情報を使用して、ログレベルの設定を行います。このスクリプトは、appspec.ymlファイルのValidateServiceライフサイクルフックの一部として参照されます。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "CodeDeploy 環境変数 DEPLOYMENT_GROUP_ID を使用してインスタンスが属するデプロイメントグループを識別し、ログレベル設定を行うスクリプトを作成します。このスクリプトを appspec.yml ファイルのインストールライフサイクルフックの一部として参照します。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "B が正解です。\nCodeDeploy はフック実行時に DEPLOYMENT_GROUP_NAME などの環境変数を自動で渡します。\n共通スクリプト内でこの値を参照して、デプロイ先（dev/stg/prod 等）に応じたログレベルを設定すれば、同一リビジョン・同一スクリプトで環境差分を吸収できます。\nフックは BeforeInstall（設定変更→その後のインストール/再起動前）で妥当です。\n他選択肢:\nA: インスタンスタグやIMDS/EC2 API参照は運用オーバーヘッド増。\nC: 環境ごとにカスタム環境変数を個別管理するのは手間。ValidateService での変更も遅い。\nD: DEPLOYMENT_GROUP_ID でも可能だが可読性が低く、名前の方が運用しやすい。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q004",
+      "questionText": "ある企業では、開発者に対し、アカウント内のすべての Amazon Elastic Block Store (Amazon EBS) ボリュームにタグを付け、必要なバックアップ頻度を示すことを義務付けています。この要件には、バックアップが不要な EBS ボリュームも含まれます。同社は、必要なバックアップ頻度に対応する値（none、dally、weekly）を持つ Backup_Frequency というカスタムタグを使用しています。監査の結果、開発者が EBS ボリュームにタグを付けていないことが時々 あることが判明しました。DevOps エンジニアは、異なる値が指定されない限り、少なくとも週に 1 回はバックアップを実行できるように、すべての EBS ボリュームに常に Backup_Frequency タグが付いていることを確認する必要があります。 これらの要件を満たすソリューションはどれでしょうか？",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "アカウントでAWS Configを設定します。バックアップ頻度タグが適用されていないすべてのAmazon EC2リソースに対してコンプライアンス違反を返すカスタムルールを作成します。カスタムAWS Systems Manager Automation Runbookを使用して、毎週の値を設定したBackup_Frequencyタグを適用する修復アクションを設定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "アカウントでAWS Configを設定します。バックアップ頻度タグが適用されていないEC2::Volumeリソースに対してコンプライアンス違反を返すマネージドルールを使用します。カスタムAWS Systems Manager Automation Runbookを使用して、毎週の値を設定したBackup_Frequencyタグを適用する修復アクションを設定します。",
+          "isCorrect": true
+        },
+        {
+          "id": "C",
+          "text": "アカウントでAWS CloudTrailを有効にします。EBS CreateVolumeイベントに反応するAmazon EventBridgeルールを作成します。AWS Systems Manager AutomationのカスタムRunbookを設定し、Backup_Frequencyタグにweeklyの値を適用します。このRunbookをルールのターゲットとして指定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "アカウントでAWS CloudTrailを有効にします。EBS CreateVolumeイベントまたはEBS ModifyVolumeイベントに反応するAmazon EventBridgeルールを作成します。AWS Systems Manager AutomationのカスタムRunbookを設定し、Backup_Frequencyタグにweeklyの値を適用します。このRunbookをルールのターゲットとして指定します。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "B が正解です。\n**AWS Config のマネージドルール（required-tags）**を使えば、対象を EC2::Volume に限定して Backup_Frequency タグの有無を継続的に評価できます（既存・新規どちらも網羅、後からタグを消されても検知）。\nさらに SSM Automation の修復アクションを関連付けて、非準拠（タグなし）検出時に Backup_Frequency=weekly を自動付与すれば、「デフォルトは週1」を担保できます。\nC/D はイベント発火時のみ（作成・変更時）で、既存の未タグ付けや後からタグ削除の検出・是正を漏らしがち。A はカスタムルール作成が不要で、B の方が運用負荷が低いです。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q005",
+      "questionText": "ある企業は、アプリケーションのデータストアとしてAmazon Auroraクラスターを使用しています。Auroraクラスターは単一のDBインスタンスで構成されています。アプリケーションは、クラスターのインスタンスエンドポイントを使用して、データベースへの読み取りおよび書き込み操作を実行します。 同社は、今後のメンテナンス期間中にクラスターに更新を適用するようにスケジュールを設定しました。メンテナンス期間中は、クラスターの中断を最小限に抑え、可用性を維持する必要があります。DevOps エンジニアはこれらの要件を満たすために何をすべきでしょうか？",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "Aurora クラスターにリーダーインスタンスを追加します。書き込み操作には Aurora クラスターのエンドポイントを使用するようにアプリケーションを更新します。読み取り操作には Aurora クラスターのリーダーエンドポイントを更新します。",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "Aurora クラスターにリーダーインスタンスを追加します。クラスター用のカスタム ANY エンドポイントを作成します。読み取りおよび書き込み操作に Aurora クラスターのカスタム ANY エンドポイントを使用するようにアプリケーションを更新します",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "Aurora クラスターのマルチ AZ オプションをオンにします。書き込み操作には Aurora クラスターのエンドポイントを使用するようにアプリケーションを更新します。読み取り操作には Aurora クラスターの読み取りエンドポイントを更新します。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "AuroraクラスターのマルチAZオプションをオンにします。クラスターのカスタムANYエンドポイントを作成します。アプリケーションを更新し、AuroraクラスターのカスタムANYエンドポイントを読み取りおよび書き込み操作に使用するようにします。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "A が正解です。\nメンテ中の中断を最小化するには、リードレプリカ（Reader インスタンス）を追加し、\n書き込み＝クラスタ（Writer）エンドポイント、読み取り＝Reader エンドポイントに分けて接続します。\nこれでメンテやフェイルオーバー時に Reader を昇格でき、可用性とレイテンシの影響を最小化できます。\n\n補足\nAurora は通常の RDS のような単純な「Multi-AZ トグル」ではなく、レプリカ追加で可用性を高めます（選択肢 C/D は不適切）。\n「ANY カスタムエンドポイント」の概念も誤りで、カスタムエンドポイントは読取り用のインスタンス集合を指す用途です（B/D 不適）。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q006",
+      "questionText": "ある企業は、アカウント間で共有するすべてのAMIを暗号化する必要があります。DevOpsエンジニアは、暗号化されていないカスタムAMIが構築されたソースアカウントにアクセスできます。また、Amazon EC2 Auto ScalingグループがAMIからEC2インスタンスを起動するターゲットアカウントにもアクセスできます。DevOpsエンジニアは、ターゲットアカウントとAMIを共有する必要があります。\n企業はソースアカウントにAWS Key Management Service (AWS KMS)キーを作成しています。\n要件を満たすために、DevOpsエンジニアが実行する必要がある追加手順はどれですか（3つ選択してください）。",
+      "isMultiAnswer": true,
+      "choices": [
+        {
+          "id": "A",
+          "text": "ソースアカウントで、暗号化されていないAMIを暗号化されたAMIにコピーします。コピーアクションでKMSキーを指定します。",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "ソースアカウントで、暗号化されていない AMI を暗号化された AMI にコピーします。コピーアクションで、デフォルトの Amazon Elastic Block Store (Amazon EBS) 暗号化キーを指定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "ソースアカウントで、ターゲットアカウントの Auto Scaling グループのサービスにリンクされたロールに権限を委任する KMS 付与を作成します。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "ソースアカウントでキーポリシーを変更し、ターゲットアカウントに権限付与を作成する権限を付与します。ターゲットアカウントで、Auto Scaling グループのサービスにリンクされたロールに権限を委任する KMS 権限付与を作成します。",
+          "isCorrect": true
+        },
+        {
+          "id": "E",
+          "text": "ソース アカウントで、暗号化されていない AMI をターゲット アカウントと共有します。",
+          "isCorrect": false
+        },
+        {
+          "id": "F",
+          "text": "ソースアカウントで、暗号化された AMI をターゲットアカウントと共有します。",
+          "isCorrect": true
+        }
+      ],
+      "explanation": "解説なし",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q007",
+      "questionText": "ある企業は、AWS CodePipeline パイプラインを使用してアプリケーションのリリースを自動化しています。典型的なパイプラインは、ビルド、テスト、デプロイメントの3つのステージで構成されています。同社はこれまで、各ステージのスクリプト実行に個別の AWS CodeBuild プロジェクトを使用していました。しかし、現在、パイプラインのデプロイメントステージを AWS CodeDeploy で処理したいと考えています。 同社はアプリケーションを RPM パッケージとしてパッケージ化しており、Amazon EC2 インスタンス群にデプロイする必要があります。EC2 インスタンスは EC2 Auto Scaling グループに属し、共通の AMI から起動されます。 これらの要件を満たすために、DevOps エンジニアはどのような手順の組み合わせを実行する必要がありますか？（2 つ選択してください。）",
+      "isMultiAnswer": true,
+      "choices": [
+        {
+          "id": "A",
+          "text": "CodeDeployエージェントをインストールした共通AMIの新しいバージョンを作成します。EC2インスタンスのIAMロールを更新して、CodeDeployへのアクセスを許可します。",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "CodeDeployエージェントをインストールした共通AMIの新しいバージョンを作成します。アプリケーションのデプロイスクリプトを含み、CodeDeployへのアクセスを許可するAppSpecファイルを作成します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "CodeDeploy でアプリケーションを作成します。インプレースデプロイタイプを設定します。デプロイ先として Auto Scaling グループを指定します。CodePipeline パイプラインに、EC2 Image Builder を使用して新しい AMI を作成するステップを追加します。作成した AMI をデプロイするように CodeDeploy を設定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "CodeDeploy でアプリケーションを作成します。インプレースデプロイタイプを設定します。デプロイ先として Auto Scaling グループを指定します。CodePipeline パイプラインを更新し、CodeDeploy アクションを使用してアプリケーションをデプロイします。",
+          "isCorrect": true
+        },
+        {
+          "id": "E",
+          "text": "CodeDeploy でアプリケーションを作成します。インプレースデプロイタイプを設定します。共通 AMI から起動された EC2 インスタンスをデプロイ先として指定します。CodePipeline パイプラインを更新し、CodeDeploy アクションを使用してアプリケーションをデプロイします。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "正解：A・D\nA：CodeDeploy を使うには、各 EC2 に CodeDeploy エージェントが必要。共通 AMI に組み込んでおくのが確実。さらに EC2 インスタンスの IAM ロールに CodeDeploy へのアクセス権限を付与するのも必須。\nD：CodeDeploy で アプリケーション／デプロイグループ（ターゲット＝Auto Scaling グループ、デプロイタイプ＝In-place） を作成し、CodePipeline のデプロイ段を CodeDeploy アクションに置き換える。これでビルド成果物（RPM＋appspec.yml＋フックスクリプト）を各インスタンスへ展開できる。\n不正解の要点\nB：appspec.yml はアーティファクト側に置く設定で、アクセス許可は定義できない。AMI 作成の重複も不要。\nC：本件は RPM の配布（アプリの in-place デプロイ） が要件で、AMI 作成や AMI デプロイは不要。\nE：「共通 AMI から起動されたインスタンス」を直接指定は不可。CodeDeploy のターゲットは ASG かタグ。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q008",
+      "questionText": "ある企業のセキュリティチームは、すべての外部アプリケーションロードバランサー（ALB）とAmazon API Gateway APIをAWS WAFウェブACLに関連付けることを義務付けています。この企業には数百のAWSアカウントがあり、それらはすべてAWS Organizations内の単一の組織に含まれています。この組織向けにAWS Configを設定しました。監査中に、AWS WAFウェブACLに関連付けられていない外部向けのALBがいくつか見つかりました。DevOps エンジニアは、将来の違反を防ぐために、どのような手順の組み合わせを実行する必要がありますか？（2つ選択してください。）",
+      "isMultiAnswer": true,
+      "choices": [
+        {
+          "id": "A",
+          "text": "AWS Firewall Manager をセキュリティアカウントに委任します",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "Amazon GuardDuty をセキュリティ アカウントに委任します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "新しく作成された ALB と API Gateway API に AWS WAF Web ACL をアタッチするための AWS Firewall Manager ポリシーを作成します。",
+          "isCorrect": true
+        },
+        {
+          "id": "D",
+          "text": "新しく作成された ALB と API Gateway API に AWS WAF Web ACL をアタッチするための Amazon GuardDuty ポリシーを作成します。",
+          "isCorrect": false
+        },
+        {
+          "id": "E",
+          "text": "AWS Config マネージドルールを設定して、新しく作成された ALB と API Gateway API に AWS WAF Web ACL をアタッチします。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "✅ A：AWS Firewall Manager をセキュリティアカウントに委任\n複数アカウント（Organizations全体）で AWS WAF の適用を一元管理するには、Firewall Manager を利用する必要があります。\nFirewall Manager は 委任管理者アカウント（通常はセキュリティアカウント） を指定することで、組織全体に WAF ポリシーを適用できます。\n✅ C：新しく作成された ALB と API Gateway API に WAF Web ACL を自動アタッチする Firewall Manager ポリシーを作成\nFirewall Manager ポリシーを使うと、新規に作成される ALB や API Gateway に自動的に WAF WebACL を関連付けることができます。\nこれにより、今後作成される外部リソースにも常に WAF が適用され、将来の違反を防止できます。\n❌ 不正解の理由\nB\tGuardDuty は脅威検知サービスであり、WAF や ALB へのポリシー適用機能はない。\nD\tGuardDuty に「WAF ポリシー」を作成する仕組みは存在しない。\nE\tAWS Config は準拠状況の検知には使えるが、自動的に WAF を適用する修復アクションは提供していない。Config 単体では「防止」ではなく「検出」に留まる。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q009",
+      "questionText": "ある企業は、規制コンプライアンス要件を満たすために、AWS Key Management Service (AWS KMS) のキーと手動キーローテーションを使用しています。セキュリティチームは、90日経過してもキーがローテーションされていない場合に通知を受け取りたいと考えています。 これを実現するソリューションはどれでしょうか？",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "キーの有効期限が 90 日を超えた場合に、Amazon Simple Notification Service (Amazon SNS) トピックに公開するように AWS KMS を設定します。",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "Amazon EventBridge イベントを設定して、AWS Lambda 関数を起動し、AWS Trusted Advisor API を呼び出して Amazon Simple Notification Service (Amazon SNS) トピックに公開します。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "キーの有効期限が 90 日を超えた場合に Amazon Simple Notification Service (Amazon SNS) トピックに発行する AWS Config カスタムルールを開発します。",
+          "isCorrect": true
+        },
+        {
+          "id": "D",
+          "text": "キーの有効期限が 90 日を超えた場合に、Amazon Simple Notification Service (Amazon SNS) トピックに公開するように AWS Security Hub を設定します。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "✅ 正解：C\nC：\nAWS Config のカスタムルールを作成し、KMS キーの最終ローテーション日から 90 日を超えている場合に SNS 通知を発行する。\nこれにより、手動ローテーション忘れを自動検知できる。\nA： KMS にはキー有効期限や期限超過通知の機能はない。\nB： Trusted Advisor は KMS のローテーションを監視しない。\nD： Security Hub ではキー経過日数のチェック機能はない。",
+      "referenceLinks": [],
+      "tags": []
+    },
+    {
+      "id": "DOP-C02-Q010",
+      "questionText": "セキュリティレビューの結果、AWS CodeBuild プロジェクトが認証されていないリクエストを使用して Amazon S3 バケットからデータベースへのデータ投入スクリプトをダウンロードしていることが確認されました。セキュリティチームは、このプロジェクトに対して S3 バケットへの認証されていないリクエストを許可していません。\nこの問題を最も安全な方法で修正するにはどうすればよいでしょうか？",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "CodeBuildプロジェクト設定のAllowedBucketsセクションにバケット名を追加します。AWS CLIを使用してデータベースポピュレーションスクリプトをダウンロードするようにビルドスペックを更新します。",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "S3バケットの設定を変更し、HTTPSベーシック認証を有効にしてトークンを指定します。ビルドスペックを更新し、cURLを使用してトークンを渡し、データベースへのデータ投入スクリプトをダウンロードします。",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "バケットポリシーを使用して、S3バケットへの認証されていないアクセスを削除します。CodeBuildプロジェクトのサービスロールを変更し、Amazon S3へのアクセスを許可します。AWS CLIを使用して、データベースへのデータ投入スクリプトをダウンロードします。",
+          "isCorrect": true
+        },
+        {
+          "id": "D",
+          "text": "バケットポリシーを使用して、S3バケットへの認証されていないアクセスを削除します。AWS CLIを使用して、IAMアクセスキーとシークレットアクセスキーを使用してデータベースへのデータ投入スクリプトをダウンロードします。",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "✅ 正解：C\nC：\nS3 バケットポリシーで 匿名アクセスを禁止し、\nCodeBuild プロジェクトの サービスロールに S3 へのアクセス権限を付与する。\nその上で、ビルド内では AWS CLI を使用して認証付きでダウンロードする。\n→ 認証済み・ロールベースで最も安全。\nA： AllowedBuckets はアクセス制御ではなく、IAM 設定が必要。匿名アクセスのままでは安全でない。\nB： S3 はベーシック認証をサポートしておらず、不適切。\nD： アクセスキーの埋め込みはセキュリティリスクが高く、ベストプラクティス違反。",
+      "referenceLinks": [],
+      "tags": []
+    }
+  ],
+  "meta": {
+    "totalQuestions": 10,
+    "lastUpdatedAt": "2025-10-31"
+  }
+}

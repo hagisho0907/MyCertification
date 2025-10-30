@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import examData from '@/app/data/sample.json'
+import examData from '@/app/data/aws-devops-pro.json'
 import QuestionCard from '@/components/QuestionCard'
 import ProgressSummary from '@/components/ProgressSummary'
 import {
