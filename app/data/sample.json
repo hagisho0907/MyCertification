@@ -1,0 +1,82 @@
+{
+  "examId": "sample",
+  "title": "Sample Test",
+  "version": "2025-01",
+  "questions": [
+    {
+      "id": "DOP-C02-Q001",
+      "questionText": "ある企業には、Application Load Balancer (ALB) への HTTP API 呼び出しを行うモバイルアプリケーションがあります。ALB はリクエストを AWS Lambda 関数にルーティングします。特定の時点では、一部のユーザーによってテストされているバージョンも含め、アプリケーションのさまざまなバージョンが使用されています。",
+      "isMultiAnswer": false,
+      "choices": [
+        {
+          "id": "A",
+          "text": "A.Lambda 関数を変更し、API オペレーション名を CloudWatch Logs に書き込む",
+          "isCorrect": true
+        },
+        {
+          "id": "B",
+          "text": "B.Lambda 関数を変更し、CloudWatch Logs Insights クエリを設定",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "C.ALB アクセスログを CloudWatch Logs に書き込む",
+          "isCorrect": false
+        },
+        {
+          "id": "D",
+          "text": "D.Lambda関数にAWS X-Rayの統合を設定",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "正解はAです。CloudWatch Logsメトリクスフィルターが最適なソリューションです。",
+      "referenceLinks": [
+        "https://docs.aws.amazon.com/cloudwatch/"
+      ],
+      "tags": [
+        "monitoring",
+        "lambda"
+      ]
+    },
+    {
+      "id": "DOP-C02-Q002",
+      "questionText": "ある企業が顧客にアプリケーションを提供しています。このアプリケーションには、AWS Lambda 関数を呼び出す Amazon API Gateway REST API があります。",
+      "isMultiAnswer": true,
+      "choices": [
+        {
+          "id": "A",
+          "text": "A.プロビジョニング同時実行を1に設定",
+          "isCorrect": false
+        },
+        {
+          "id": "B",
+          "text": "B.予約同時実行を0に設定",
+          "isCorrect": false
+        },
+        {
+          "id": "C",
+          "text": "C.プロビジョニング同時実行とAuto Scalingを設定",
+          "isCorrect": true
+        },
+        {
+          "id": "D",
+          "text": "D.予約同時実行とAPI GatewayのAuto Scalingを設定",
+          "isCorrect": true
+        }
+      ],
+      "explanation": "正解はCとDです。プロビジョニング同時実行がコールドスタートを解決します。",
+      "referenceLinks": [
+        "https://docs.aws.amazon.com/lambda/",
+        "https://docs.aws.amazon.com/apigateway/"
+      ],
+      "tags": [
+        "lambda",
+        "performance"
+      ]
+    }
+  ],
+  "meta": {
+    "totalQuestions": 2,
+    "lastUpdatedAt": "2025-01-01"
+  }
+}
