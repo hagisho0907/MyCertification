@@ -8,6 +8,7 @@ type SessionHistoryListProps = {
   sessionHistory: SessionProgress[]
   totalQuestions: number
   questions: Question[]
+  onDeleteSession: (sessionNumber: number) => void
 }
 
 type SessionDetailModalProps = {
@@ -177,6 +178,7 @@ export default function SessionHistoryList({
   sessionHistory,
   totalQuestions,
   questions,
+  onDeleteSession,
 }: SessionHistoryListProps) {
   const [selectedSession, setSelectedSession] = useState<SessionProgress | null>(null)
 
@@ -212,12 +214,20 @@ export default function SessionHistoryList({
                     {formatDateTime(session.completedAt)}
                   </p>
                 </div>
-                <button
-                  onClick={() => setSelectedSession(session)}
-                  className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100"
-                >
-                  詳細を見る
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedSession(session)}
+                    className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                  >
+                    詳細を見る
+                  </button>
+                  <button
+                    onClick={() => onDeleteSession(session.sessionNumber)}
+                    className="rounded-lg border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
+                  >
+                    削除
+                  </button>
+                </div>
               </div>
 
               {stats ? (

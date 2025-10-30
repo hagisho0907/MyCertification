@@ -14,7 +14,6 @@ import {
   updateSessionPage,
   calculateSessionStats,
 } from '@/lib/progress'
-import SessionHistoryList from '@/components/SessionHistoryList'
 import { ExamProgress } from '@/lib/types'
 
 const QUESTIONS_PER_PAGE = 20
@@ -247,11 +246,6 @@ export default function ExamContent() {
           </>
         )}
 
-        <SessionHistoryList
-          sessionHistory={examProgress.sessionHistory}
-          totalQuestions={examData.meta.totalQuestions}
-          questions={examData.questions}
-        />
       </main>
     </div>
   )

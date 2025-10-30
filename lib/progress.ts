@@ -314,3 +314,30 @@ export function getReviewQuestionIds(progress: ExamProgress): string[] {
     .filter(([_, value]) => value.isFlaggedForReview || value.lastResult === 'incorrect')
     .map(([questionId]) => questionId)
 }
+
+export function removeSessionFromHistory(
+  progress: ExamProgress,
+  sessionNumber: number
+): ExamProgress {
+  const filteredHistory = progress.sessionHistory.filter(
+    (session) => session.sessionNumber !== sessionNumber
+  )
+
+  let updatedCurrentSession = progress.currentSession
+  if (progress.currentSession?.sessionNumber === sessionNumber) {
+    updatedCurrentSession = undefined
+  }
+
+  const updatedExamProgress: ExamProgress = {
+    ...progress,
+    updatedAt: isoNow(),
+    currentSession: updatedCurrentSession,
+    sessionHistory: filteredHistory,
+  }
+
+  if (!updatedExamProgress.currentSession && filteredHistory.length === 0) {
+    updatedExamProgress.nextSessionNumber = 1
+  }
+
+  return updatedExamProgress
+}

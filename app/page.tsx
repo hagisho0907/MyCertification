@@ -19,7 +19,7 @@ export default function Home() {
           <p className="text-gray-600 mb-2">問題数: {examData.meta.totalQuestions}問</p>
           <p className="text-gray-600 mb-6">最終更新日: {examData.meta.lastUpdatedAt}</p>
           
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link
               href="/exam"
               className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -31,6 +31,12 @@ export default function Home() {
               className="inline-block bg-orange-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-orange-700 transition-colors"
             >
               復習リストを見る
+            </Link>
+            <Link
+              href="/history"
+              className="inline-block bg-gray-200 text-gray-800 px-8 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+            >
+              セッション履歴を見る
             </Link>
           </div>
         </div>
