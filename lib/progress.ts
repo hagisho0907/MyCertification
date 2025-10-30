@@ -335,9 +335,13 @@ export function removeSessionFromHistory(
     sessionHistory: filteredHistory,
   }
 
-  if (!updatedExamProgress.currentSession && filteredHistory.length === 0) {
-    updatedExamProgress.nextSessionNumber = 1
+  const remainingNumbers: number[] = filteredHistory.map((s) => s.sessionNumber)
+  if (updatedExamProgress.currentSession) {
+    remainingNumbers.push(updatedExamProgress.currentSession.sessionNumber)
   }
+
+  updatedExamProgress.nextSessionNumber =
+    remainingNumbers.length > 0 ? Math.max(...remainingNumbers) + 1 : 1
 
   return updatedExamProgress
 }

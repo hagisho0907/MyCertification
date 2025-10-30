@@ -33,6 +33,7 @@ export default function HistoryPage() {
     const updated = removeSessionFromHistory(draftHistory, sessionNumber)
     saveExamProgress(updated)
     setDraftHistory(updated)
+    setExamProgress(updated)
   }
 
   return (

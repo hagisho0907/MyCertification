@@ -134,6 +134,7 @@ type ExamProgress = {
   - 復習フラグ操作は `cumulative[questionId].isFlaggedForReview` を更新する（セッションを跨いで維持）。
   - ページ遷移のたびに `currentSession.lastPage` を更新し、途中から「再開」した際に該当ページへ遷移できるようにする。
   - セッション終了時は `currentSession.completedAt` を設定し、`sessionHistory` の先頭に追加、`currentSession` を未定義化、`nextSessionNumber` をインクリメント。
+  - セッション削除時は `sessionHistory` から対象を除外し、残存セッション番号の最大値 + 1 を `nextSessionNumber` として再設定する。
   - 「履歴リセット」で ExamProgress を初期化。
   - バージョンが変わった場合は互換性チェックを行い、必要なら自動リセット。
 

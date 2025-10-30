@@ -116,13 +116,21 @@ export default function ExamContent() {
                   : `次は第${currentSessionNumber}回目の学習です`}
               </p>
             </div>
-            <ProgressSummary 
-              examProgress={examProgress} 
-              totalQuestions={examData.meta.totalQuestions}
-              onStartNewSession={handleBeginSession}
-              onResumeSession={handleResumeSession}
-              onCompleteSession={handleCompleteSession}
-            />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push('/')}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                ホームへ戻る
+              </button>
+              <ProgressSummary 
+                examProgress={examProgress} 
+                totalQuestions={examData.meta.totalQuestions}
+                onStartNewSession={handleBeginSession}
+                onResumeSession={handleResumeSession}
+                onCompleteSession={handleCompleteSession}
+              />
+            </div>
           </div>
         </div>
       </header>

@@ -222,7 +222,12 @@ export default function SessionHistoryList({
                     詳細を見る
                   </button>
                   <button
-                    onClick={() => onDeleteSession(session.sessionNumber)}
+                    onClick={() => {
+                      setSelectedSession((prev) =>
+                        prev?.sessionNumber === session.sessionNumber ? null : prev
+                      )
+                      onDeleteSession(session.sessionNumber)
+                    }}
                     className="rounded-lg border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
                   >
                     削除
