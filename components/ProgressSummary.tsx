@@ -56,16 +56,19 @@ export default function ProgressSummary({
     ? `第${examProgress.currentSession!.sessionNumber}回目を記録中`
     : '次のセッションを開始できます'
   const containerClasses = compact
-    ? 'w-full rounded-lg border border-gray-200 bg-white p-2 sm:p-3 shadow-sm'
+    ? 'w-full rounded-lg border border-gray-200 bg-white p-1.5 sm:p-2.5 shadow-sm'
     : 'w-full rounded-xl border border-gray-200 bg-white/90 p-3 sm:p-4 shadow-sm'
   const labelClasses = compact
-    ? 'text-[10px] font-semibold uppercase tracking-wide text-gray-500'
+    ? 'text-[9px] font-semibold uppercase tracking-wide text-gray-500'
     : 'text-[11px] font-semibold uppercase tracking-wide text-gray-500'
   const statusClasses = compact
-    ? 'text-xs font-medium text-gray-800'
+    ? 'text-[11px] font-medium text-gray-800'
     : 'text-sm font-medium text-gray-800'
-  const iconButtonPadding = compact ? 'p-1' : 'p-1.5'
-  const iconSize = compact ? 'w-3.5 h-3.5' : 'w-4 h-4'
+  const iconButtonPadding = compact ? 'p-0.5' : 'p-1.5'
+  const iconSize = compact ? 'w-3 h-3' : 'w-4 h-4'
+  const detailText = compact ? 'text-xs' : 'text-sm'
+  const detailLabel = compact ? 'text-[11px]' : 'text-xs'
+  const detailSpacing = compact ? 'mt-2 space-y-0.5' : 'mt-2 space-y-1'
 
   return (
     <div className={containerClasses}>
@@ -130,12 +133,12 @@ export default function ProgressSummary({
       {!isCollapsed && (
         <div
           id="progress-summary-panel"
-          className="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-6"
+          className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
         >
-          <div className="flex-1 min-w-[200px] rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
-            <span className="block font-semibold text-gray-900 text-xs">今回のセッション</span>
+          <div className={`flex-1 min-w-[180px] rounded-lg bg-gray-50 p-2.5 ${detailText} text-gray-600`}>
+            <span className={`block font-semibold text-gray-900 ${detailLabel}`}>今回のセッション</span>
             {session ? (
-              <div className="mt-2 space-y-1">
+              <div className={detailSpacing}>
                 <p>
                   正答率:{' '}
                   <span className="font-semibold text-blue-600">
@@ -155,9 +158,9 @@ export default function ProgressSummary({
             )}
           </div>
 
-          <div className="flex-1 min-w-[200px] rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
-            <span className="block font-semibold text-gray-900 text-xs">累積</span>
-            <div className="mt-2 space-y-1">
+          <div className={`flex-1 min-w-[180px] rounded-lg bg-gray-50 p-2.5 ${detailText} text-gray-600`}>
+            <span className={`block font-semibold text-gray-900 ${detailLabel}`}>累積</span>
+            <div className={detailSpacing}>
               <p>
                 正答率:{' '}
                 <span className="font-semibold text-blue-600">

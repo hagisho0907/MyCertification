@@ -107,19 +107,19 @@ export default function ExamContent() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{examData.title}</h1>
-              <p className="text-sm text-gray-500">
+          <div className="py-2 flex flex-col gap-1.5 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-0.5">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">{examData.title}</h1>
+              <p className="text-xs sm:text-sm text-gray-500">
                 {examProgress.currentSession
                   ? `第${examProgress.currentSession.sessionNumber}回目の学習中`
                   : `次は第${currentSessionNumber}回目の学習です`}
               </p>
             </div>
-            <div className="flex flex-col gap-2 w-full md:w-auto md:flex-row md:items-center md:gap-3">
+            <div className="flex flex-col gap-1.5 w-full md:w-auto md:flex-row md:items-center md:gap-2.5">
               <button
                 onClick={() => router.push('/')}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors w-full md:w-auto text-center"
+                className="px-3 py-1.5 rounded-lg border border-gray-300 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors w-full md:w-auto text-center"
               >
                 ホームへ戻る
               </button>
