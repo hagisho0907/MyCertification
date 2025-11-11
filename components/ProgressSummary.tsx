@@ -30,77 +30,88 @@ export default function ProgressSummary({
   }
   
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex flex-col text-xs text-gray-600">
-        <span className="font-semibold text-gray-800 mb-1">今回のセッション</span>
+    <div className="w-full rounded-2xl border border-gray-200 bg-gray-50 p-4 shadow-sm flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+      <div className="flex-1 min-w-[220px] text-sm text-gray-600">
+        <span className="block font-semibold text-gray-900 text-base sm:text-sm">今回のセッション</span>
         {session ? (
-          <div className="flex gap-3">
+          <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4">
             <span>
-              正答率: <span className="font-semibold text-blue-600">{session.correctRate.toFixed(1)}%</span>
+              正答率:{' '}
+              <span className="font-semibold text-blue-600">
+                {session.correctRate.toFixed(1)}%
+              </span>
             </span>
             <span>
               回答数: <span className="font-semibold">{session.answeredCount}</span>
             </span>
             <span>
-              不正解: <span className="font-semibold text-red-600">{session.incorrectCount}</span>
+              不正解:{' '}
+              <span className="font-semibold text-red-600">{session.incorrectCount}</span>
             </span>
           </div>
         ) : (
-          <span>未開始</span>
+          <span className="mt-2 text-gray-500">未開始</span>
         )}
       </div>
-      <div className="flex flex-col text-xs text-gray-600">
-        <span className="font-semibold text-gray-800 mb-1">累積</span>
-        <div className="flex gap-3">
+
+      <div className="flex-1 min-w-[220px] text-sm text-gray-600">
+        <span className="block font-semibold text-gray-900 text-base sm:text-sm">累積</span>
+        <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-4">
           <span>
-            正答率: <span className="font-semibold text-blue-600">{cumulative.correctRate.toFixed(1)}%</span>
+            正答率:{' '}
+            <span className="font-semibold text-blue-600">
+              {cumulative.correctRate.toFixed(1)}%
+            </span>
           </span>
           <span>
             未回答: <span className="font-semibold">{cumulative.unansweredCount}</span>
           </span>
           <span>
-            復習: <span className="font-semibold text-orange-600">{cumulative.flaggedCount}</span>
+            復習:{' '}
+            <span className="font-semibold text-orange-600">{cumulative.flaggedCount}</span>
           </span>
         </div>
       </div>
-      
-      {onStartNewSession && !hasActiveSession && (
-        <button
-          onClick={onStartNewSession}
-          className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
-          title="新しいセッションを開始"
-        >
-          <PlayIcon className="w-5 h-5" />
-        </button>
-      )}
 
-      {onResumeSession && hasActiveSession && (
-        <button
-          onClick={onResumeSession}
-          className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
-          title="セッションを再開"
-        >
-          <PlayIcon className="w-5 h-5" />
-        </button>
-      )}
+      <div className="flex items-center gap-2 sm:ml-auto">
+        {onStartNewSession && !hasActiveSession && (
+          <button
+            onClick={onStartNewSession}
+            className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
+            title="新しいセッションを開始"
+          >
+            <PlayIcon className="w-5 h-5" />
+          </button>
+        )}
 
-      {onCompleteSession && hasActiveSession && (
+        {onResumeSession && hasActiveSession && (
+          <button
+            onClick={onResumeSession}
+            className="p-2 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
+            title="セッションを再開"
+          >
+            <PlayIcon className="w-5 h-5" />
+          </button>
+        )}
+
+        {onCompleteSession && hasActiveSession && (
+          <button
+            onClick={onCompleteSession}
+            className="p-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100"
+            title="セッションを終了"
+          >
+            <Square2StackIcon className="w-5 h-5" />
+          </button>
+        )}
+        
         <button
-          onClick={onCompleteSession}
-          className="p-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100"
-          title="セッションを終了"
+          onClick={handleReset}
+          className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+          title="履歴をリセット"
         >
-          <Square2StackIcon className="w-5 h-5" />
+          <ArrowPathIcon className="w-5 h-5" />
         </button>
-      )}
-      
-      <button
-        onClick={handleReset}
-        className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-        title="履歴をリセット"
-      >
-        <ArrowPathIcon className="w-5 h-5" />
-      </button>
+      </div>
     </div>
   )
 }

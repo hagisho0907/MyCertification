@@ -107,7 +107,7 @@ export default function ExamContent() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4 flex items-center justify-between">
+          <div className="py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{examData.title}</h1>
               <p className="text-sm text-gray-500 mt-1">
@@ -116,10 +116,10 @@ export default function ExamContent() {
                   : `次は第${currentSessionNumber}回目の学習です`}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 w-full md:w-auto md:items-end">
               <button
                 onClick={() => router.push('/')}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors w-full sm:w-auto text-center"
               >
                 ホームへ戻る
               </button>
@@ -135,7 +135,7 @@ export default function ExamContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-8 bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900 mb-3">学習セッション</h2>
           {hasActiveSession && currentSessionStats ? (
@@ -143,7 +143,7 @@ export default function ExamContent() {
               <p className="text-gray-600 mb-4">
                 {`第${examProgress.currentSession!.sessionNumber}回目の学習を継続中です。途中のページから再開できます。`}
               </p>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+              <div className="flex flex-col gap-2 text-sm text-gray-600 mb-4 sm:flex-row sm:flex-wrap">
                 <span>
                   正答率:{' '}
                   <span className="font-semibold text-blue-600">
@@ -164,13 +164,13 @@ export default function ExamContent() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleResumeSession}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors w-full sm:w-auto text-center"
                 >
                   続きから学習する
                 </button>
                 <button
                   onClick={handleCompleteSession}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors w-full sm:w-auto text-center"
                 >
                   セッションを終了する
                 </button>
@@ -184,7 +184,7 @@ export default function ExamContent() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleBeginSession}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors w-full sm:w-auto text-center"
                 >
                   {`第${currentSessionNumber}回目の学習を開始`}
                 </button>
@@ -198,13 +198,13 @@ export default function ExamContent() {
 
         {examProgress.currentSession && (
           <>
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-gray-600">
                 ページ {page} / {totalPages} （{startIndex + 1}〜{endIndex} 問目）
               </span>
               <button
                 onClick={handleCompleteSession}
-                className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors w-full sm:w-auto text-center"
               >
                 セッションを終了する
               </button>
@@ -222,30 +222,30 @@ export default function ExamContent() {
               ))}
             </div>
 
-            <div className="mt-8 flex justify-between items-center">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
-                className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto text-center"
               >
                 前の20問
               </button>
               
-              <span className="text-gray-600">
+              <div className="text-gray-600 text-center">
                 {page} / {totalPages}
-              </span>
+              </div>
               
               {page < totalPages ? (
                 <button
                   onClick={() => handlePageChange(page + 1)}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors w-full sm:w-auto text-center"
                 >
                   次の20問
                 </button>
               ) : (
                 <button
                   onClick={handleFinishLearning}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors w-full sm:w-auto text-center"
                 >
                   学習を終了する
                 </button>
