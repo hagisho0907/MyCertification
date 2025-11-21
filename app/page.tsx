@@ -16,8 +16,8 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold mb-4">{examData.title}</h2>
-          <p className="text-gray-600 mb-2">問題数: {examData.meta.totalQuestions}問</p>
-          <p className="text-gray-600 mb-6">最終更新日: {examData.meta.lastUpdatedAt}</p>
+          <p className="text-gray-600 mb-2">問題数: {examData.questions.length}問</p>
+          <p className="text-gray-600 mb-6">バージョン: {examData.version}</p>
           
           <div className="flex flex-wrap gap-4">
             <Link
@@ -41,7 +41,7 @@ export default function Home() {
           </div>
         </div>
 
-        <StatsCards examId={examData.examId} totalQuestions={examData.meta.totalQuestions} />
+        <StatsCards examId={examData.examId} totalQuestions={examData.questions.length} />
       </main>
     </div>
   )

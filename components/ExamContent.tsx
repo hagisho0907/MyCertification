@@ -119,7 +119,7 @@ export default function ExamContent() {
   const currentSessionNumber = examProgress.currentSession?.sessionNumber ?? examProgress.nextSessionNumber
   const currentSessionStats = calculateSessionStats(
     examProgress.currentSession,
-    examData.meta.totalQuestions
+    examData.questions.length
   )
   const hasActiveSession = Boolean(examProgress.currentSession)
 
@@ -146,7 +146,7 @@ export default function ExamContent() {
               <div className="w-full md:w-auto">
                 <ProgressSummary 
                   examProgress={examProgress} 
-                  totalQuestions={examData.meta.totalQuestions}
+                  totalQuestions={examData.questions.length}
                   onStartNewSession={handleBeginSession}
                   onResumeSession={handleResumeSession}
                   onCompleteSession={handleCompleteSession}
