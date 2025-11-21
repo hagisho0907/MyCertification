@@ -1,7 +1,7 @@
 {
   "examId": "aws-devops-pro",
   "title": "AWS Certified DevOps Engineer - Professional",
-  "version": "2025-01",
+  "version": "2025-11",
   "questions": [
     {
       "id": "DOP-C02-Q001",
@@ -725,7 +725,7 @@
         },
         {
           "id": "E",
-          "text": "パイプラインを修正し、us-east-1 の S3 バケットをアーティファクトストアとして追加します。パイプラインに us-east-1 用の新しい CloudFormation デプロイアクションを作成します。この新しいデプロイアクションは、us-east-1 の出力アーティファクトの CloudFormation テンプレートを使用するように設定します。 ",
+          "text": "パイプラインを修正し、us-east-1 の S3 バケットをアーティファクトストアとして追加します。パイプラインに us-east-1 用の新しい CloudFormation デプロイアクションを作成します。この新しいデプロイアクションは、us-east-1 の出力アーティファクトの CloudFormation テンプレートを使用するように設定します。",
           "isCorrect": true
         }
       ],
@@ -875,7 +875,7 @@
         },
         {
           "id": "D",
-          "text": "Auto Scaling ライフサイクルフックを使用して、インスタンスを「終了中:待機」状態にします。Amazon EventBridge ルールで EC2 インスタンス終了ライフサイクルアクションを作成し、SSM Run Command スクリプトを呼び出す AWS Lambda 関数をトリガーしてログを収集し、Amazon S3 にプッシュします。ログが収集されたらライフサイクルアクションを完了します。 ",
+          "text": "Auto Scaling ライフサイクルフックを使用して、インスタンスを「終了中:待機」状態にします。Amazon EventBridge ルールで EC2 インスタンス終了ライフサイクルアクションを作成し、SSM Run Command スクリプトを呼び出す AWS Lambda 関数をトリガーしてログを収集し、Amazon S3 にプッシュします。ログが収集されたらライフサイクルアクションを完了します。",
           "isCorrect": true
         }
       ],
@@ -1356,12 +1356,12 @@
         {
           "id": "A",
           "text": "CloudWatch エージェントをサーバー側にインストールし、関連するログを CloudWatch にアップロードするようにエージェントを設定します。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "B",
           "text": "API Gateway で AWS X-Ray トレースを有効にし、リクエストセグメントをキャプチャするようにアプリケーションを変更し、各リクエストごとにそれらのセグメントを X-Ray にアップロードします。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "C",
@@ -1379,7 +1379,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "✅ 正解：B・C\n問題の要点\nAPI Gateway → オンプレミスAPI をバックエンドとして利用\n顧客から「レスポンス遅い」と苦情\nCloudWatchでレイテンシーは確認済み\n原因特定のために詳細な分解情報（どこで遅延が発生しているか）を取得したい\nただし、レイテンシーを増やさない方法で実施したい\n解答の方向性\nこのようなケースで最も効果的なのは：\nAWS X-Rayによる分散トレーシング\nこれにより、\nAPI Gateway → VPC Link → オンプレミスAPI\nのリクエスト経路全体の遅延を可視化\nボトルネック箇所の特定が可能\n（例：ネットワーク遅延？API内部処理？データベース？）\nB・C の内容と役割\nB. API GatewayでX-Rayを有効化\nAPI Gatewayのトレース設定をオンにすることで、\nAPI Gatewayレイヤーでの処理時間\nバックエンド呼び出し時間\nが自動的にX-Rayトレースに記録される。\nC. オンプレミスアプリでX-Rayを統合\nオンプレミス側アプリにもX-Ray SDKを導入し、\nトレースセグメントを生成・送信するようにする。\nX-Rayデーモンを利用して、低オーバーヘッドでX-Rayにアップロード。\n→ レイテンシーへの影響を最小限に。\n✅ 「B」でAPI Gateway側の可視化\n✅ 「C」でバックエンド（オンプレミス）側の可視化\n→ 両方のトレースをつなげてエンドツーエンドの遅延分析が可能\n❌ 他の選択肢が不適な理由\nA\tCloudWatchエージェントはインフラ監視用。\nアプリのリクエスト単位のトレースは不可。\nD\t各リクエストにログデータを返すとレイテンシーが増加し、セキュリティ的にも非推奨。\nE\tアプリで独自にメトリクスをアップロードするとオーバーヘッド増。リアルタイム分析も難しい。\n✅ まとめ\nレイテンシーの根本原因特定\tAWS X-Ray\n既存のAPI Gatewayとの統合\tB\nオンプレミスAPIの詳細トレース\tC\nパフォーマンス影響を最小化\tX-Ray デーモン利用\n✅ 正解：B（API GatewayでX-Ray有効化）＋C（オンプレミスでX-Rayデーモン使用）",
+      "explanation": "答えは A と C です。\nA. CloudWatch エージェントをサーバー側にインストール\nオンプレサーバーに CloudWatch エージェントを入れて、\nアプリケーションログや OS メトリクス（CPU、メモリ、ディスクIO など）を CloudWatch に送ると、\n既存のリクエスト処理とは 非同期にログ送信 される\nそのため、レイテンシーへの影響を最小化しつつ、詳細な情報を収集できる\n→ レイテンシーを増やさずに、バックエンド側の状況を可視化できるので適切。\nC. API Gateway で X-Ray を有効化 + X-Ray デーモン経由で送信\nAPI Gateway 側で AWS X-Ray トレースを有効にし、\nオンプレアプリ側も X-Ray SDK を組み込んでセグメントを生成し、\nX-Ray デーモン を使ってセグメントを送信する構成です。\nアプリはローカルの X-Ray デーモンに送るだけなので 軽量・低オーバーヘッド\nデーモンがバッチ化して X-Ray に送るので、ネットワーク負荷も抑えられる\nAPI Gateway → オンプレ API までのどこで遅延しているかをトレースで特定しやすい\n→ レイテンシーをほとんど増やさずに、エンドツーエンドの遅延要因を追えるのでベストプラクティス。\n他の選択肢が微妙な理由\nB：アプリが直接 X-Ray にセグメントをアップロードすると、\n各リクエストで外部への送信が発生し、レイテンシー増加リスクが高い。\nD：レスポンスにログ情報を詰めると、レスポンスサイズ増加・アプリの処理増加で\nレイテンシー悪化の可能性があり、ログ集約も面倒。\nE：CloudWatch にカスタムメトリクスをアップロードする処理を\nリクエスト処理と同期的に行うとレイテンシーが増加するリスクがある。\nまた、単純な統計値だけではボトルネック特定の粒度が粗くなりがち。\nしたがって、レイテンシーを増やさずに関連データを収集するという要件を満たすのは\nA と C です。",
       "referenceLinks": [],
       "tags": []
     },
@@ -1765,7 +1765,7 @@
     },
     {
       "id": "DOP-C02-Q056",
-      "questionText": "DevOpsエンジニアは、AWS CodePipelineを使用して、以下の手順でWebサービスのデプロイを自動化しました。1\n. AWS CodeBuildプロジェクトがデプロイアーティファクトをコンパイルし、単体テストを実行します。2 .\nAWS CodeDeployデプロイグループが、ステージング環境のAmazon EC2インスタンス\nにWebサービスをデプロイします。3. CodeDeployデプロイグループが、本番環境のEC2インスタンスにWebサービスをデプロイします。\n品質保証（QA）チームは、本番環境へのデプロイ前にビルドアーティファクトを検査する権限を要求します。QAチームは、手動テストを実施するために、内部侵入テストツールを実行したいと考えています。このツールは、REST API呼び出しによって呼び出されます。\nこの要求を満たすために、DevOpsエンジニアはどのようなアクションの組み合わせを実行する必要がありますか？（2つ選択してください。）",
+      "questionText": "DevOpsエンジニアは、AWS CodePipelineを使用して、以下の手順でWebサービスのデプロイを自動化しました。\n1. AWS CodeBuildプロジェクトがデプロイアーティファクトをコンパイルし、単体テストを実行します。\n2 .AWS CodeDeployデプロイグループが、ステージング環境のAmazon EC2インスタンス\nにWebサービスをデプロイします。3. CodeDeployデプロイグループが、本番環境のEC2インスタンスにWebサービスをデプロイします。\n品質保証（QA）チームは、本番環境へのデプロイ前にビルドアーティファクトを検査する権限を要求します。QAチームは、手動テストを実施するために、内部侵入テストツールを実行したいと考えています。このツールは、REST API呼び出しによって呼び出されます。\nこの要求を満たすために、DevOpsエンジニアはどのようなアクションの組み合わせを実行する必要がありますか？（2つ選択してください。）",
       "isMultiAnswer": true,
       "choices": [
         {
@@ -2860,7 +2860,7 @@
         },
         {
           "id": "B",
-          "text": " APIのデプロイステージの直後にCodePipelineアクションを作成します。API GatewayとのCodePipeline統合を使用してSDKをAmazon S3にエクスポートするようにアクションを設定します。また、Amazon S3とのCodePipeline統合を使用してSDKパスのキャッシュを無効にする別のアクションも作成します。",
+          "text": "APIのデプロイステージの直後にCodePipelineアクションを作成します。API GatewayとのCodePipeline統合を使用してSDKをAmazon S3にエクスポートするようにアクションを設定します。また、Amazon S3とのCodePipeline統合を使用してSDKパスのキャッシュを無効にする別のアクションも作成します。",
           "isCorrect": false
         },
         {
@@ -2925,7 +2925,7 @@
         },
         {
           "id": "C",
-          "text": " AWS Config の評価結果が NON_COMPLIANT である制限付き SSH ルールに一致する Amazon EventBridge ルールを作成します。EventBridge ルールを設定して、SNS トピックで AWS Systems Manager Run Command を呼び出し、通知をカスタマイズして SNS トピックに発行します。",
+          "text": "AWS Config の評価結果が NON_COMPLIANT である制限付き SSH ルールに一致する Amazon EventBridge ルールを作成します。EventBridge ルールを設定して、SNS トピックで AWS Systems Manager Run Command を呼び出し、通知をカスタマイズして SNS トピックに発行します。",
           "isCorrect": false
         },
         {
@@ -4740,7 +4740,7 @@
     },
     {
       "id": "DOP-C02-Q150",
-      "questionText": "ある企業が、AWS LambdaとAmazon API Gatewayを活用したサーバーレスアーキテクチャを採用したウェブおよびモバイルアプリケーションを構築しています。AWS CodeCommitリポジトリの適切な環境ブランチにプッシュされたコードに基づいて、バックエンドのLambdaデプロイメントを完全に自動化したいと考えています。この\nデプロイメントには、以下の要件を満たす必要があります。\n• テスト環境と本番環境で別々の環境パイプラインを用意\nする • テスト環境のみで自動デプロイメントを実行する\nこれらの要件を満たすには、どのような手順を踏むべきでしょうか？",
+      "questionText": "ある企業が、AWS LambdaとAmazon API Gatewayを活用したサーバーレスアーキテクチャを採用したウェブおよびモバイルアプリケーションを構築しています。AWS CodeCommitリポジトリの適切な環境ブランチにプッシュされたコードに基づいて、バックエンドのLambdaデプロイメントを完全に自動化したいと考えています。この\nデプロイメントには、以下の要件を満たす必要があります。\n• テスト環境と本番環境で別々の環境パイプラインを用意する\n• テスト環境のみで自動デプロイメントを実行する\nこれらの要件を満たすには、どのような手順を踏むべきでしょうか？",
       "isMultiAnswer": false,
       "choices": [
         {
@@ -4884,7 +4884,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "解説なし",
+      "explanation": "答え：B\n要件を分解すると：\nLinux AMI を定期的にパッチ適用してゴールデンイメージを作る\nChef エージェントの新バージョンがあれば、それもイメージに組み込む\n新しい AMI を、Organizations 配下の各部門アカウントに配布する\nかつ管理オーバーヘッドを最小化したい\nこれに一番フィットするのが Amazon EC2 Image Builder + AWS RAM の組み合わせです。\nなぜ B が正解か\nB. Amazon EC2 Image Builder を使用して、ベース Linux AMI と Chef エージェントをインストールするためのコンポーネントで構成されるイメージパイプラインを作成します。AWS Resource Access Manager を使用して、EC2 Image Builder イメージを部門のアカウントと共有します。\nEC2 Image Builder\n定期スケジュールでパイプライン実行（例：毎週/毎月）\nベース Linux AMI に OS パッチを自動適用\nChef エージェントインストール用コンポーネントを定義しておくことで、自動的に最新バージョンを取得してインストールさせられる\nゴールデン AMI を自動で生成\nAWS Resource Access Manager (RAM)\n生成されたイメージ（または AMI）を、Organizations 配下の複数アカウントに一括共有できる\n共有設定を一度作っておけば、以後は新イメージが自動的に対象アカウントに見えるようになり、手動配布やスクリプト管理が不要\n→ これにより、イメージ作成〜マルチアカウント配布までをフルマネージドに近い形で自動化でき、管理オーバーヘッドが最小になります。\n他の選択肢がイマイチな理由\nA: 自前スクリプトで EC2 起動 → パッチ → Chef 更新 → AMI 作成 → アカウント共有\nすべての処理をスクリプト管理する必要があり、保守コスト大。\nC: SSM Automation で AMI 更新 ＋ Organizations でイメージ置き換え\n「Organizations を使って AMI を各アカウントのゴールデンイメージに置き換える」という、実在しないような抽象的表現で実装不明瞭。\nマルチアカウント配布の仕組みが明確でない。\nD: Image Builder までは良いが、SSM パラメータストアに AMI ID を記録するだけでは各アカウントへの AMI 共有は完結しない。\nそもそも AMI 自体を各アカウントと共有しなければ、他アカウントからその AMI ID を指定しても使えない。\n共有の仕組みとして不十分。\n以上より、管理オーバーヘッドが最も少ない正解は B となります。",
       "referenceLinks": [],
       "tags": []
     },
@@ -5015,7 +5015,7 @@
     },
     {
       "id": "DOP-C02-Q159",
-      "questionText": "ある企業は、AWS Control Tower でアプリケーションチームの AWS アカウントを管理しています。各アプリケーションチームは、それぞれの AWS アカウントのセキュリティ保護に責任を負っています。DevOps\nエンジニアは、アプリケーションチームがまだ GuardDuty を有効にしていないすべての AWS アカウントに対して Amazon GuardDuty を有効にする必要があります。DevOps エンジニアは、AWS Control Tower 管理アカウントから AWS CloudFormation StackSets を使用しています。StackSets\nのデプロイ中に障害が発生しないようにするには、DevOps エンジニアは CloudFormation テンプレートをどのように設定すればよいでしょうか。",
+      "questionText": "ある企業は、AWS Control Tower でアプリケーションチームの AWS アカウントを管理しています。各アプリケーションチームは、それぞれの AWS アカウントのセキュリティ保護に責任を負っています。DevOpsエンジニアは、アプリケーションチームがまだ GuardDuty を有効にしていないすべての AWS アカウントに対して Amazon GuardDuty を有効にする必要があります。DevOps エンジニアは、AWS Control Tower 管理アカウントから AWS CloudFormation StackSets を使用しています。StackSetsのデプロイ中に障害が発生しないようにするには、DevOps エンジニアは CloudFormation テンプレートをどのように設定すればよいでしょうか。",
       "isMultiAnswer": false,
       "choices": [
         {
@@ -5045,7 +5045,7 @@
     },
     {
       "id": "DOP-C02-Q160",
-      "questionText": "ある企業にはAWS Control Towerのランディングゾーンがあります。同社のDevOpsチームはワークロードOUを作成します。開発OUと本番OUはワークロードOUの下にネストされています。同社は、アプリケーションをデプロイするために、ユーザーに社内のAWSアカウントへのフルアクセスを許可しています。DevOps\nチームは、本番OU内のAWSアカウントのIAMロールとポリシーを管理するための権限を、特定の管理IAMロールのみに付与する必要があります。\nこれらの要件を満たす手順の組み合わせはどれですか？（2つ選択してください。）",
+      "questionText": "ある企業にはAWS Control Towerのランディングゾーンがあります。同社のDevOpsチームはワークロードOUを作成します。開発OUと本番OUはワークロードOUの下にネストされています。同社は、アプリケーションをデプロイするために、ユーザーに社内のAWSアカウントへのフルアクセスを許可しています。DevOpsチームは、本番OU内のAWSアカウントのIAMロールとポリシーを管理するための権限を、特定の管理IAMロールのみに付与する必要があります。\nこれらの要件を満たす手順の組み合わせはどれですか？（2つ選択してください。）",
       "isMultiAnswer": true,
       "choices": [
         {
@@ -5116,12 +5116,12 @@
         {
           "id": "A",
           "text": "EKS クラスターに Horizo​​ntal Pod Autoscaler を実装します。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "B",
           "text": "EKS クラスターに Vertical Pod Autoscaler を実装します。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "C",
@@ -5174,7 +5174,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "✅ 正解：A・C・E\n💡 シンプル解説\nAWS Control Tower でカスタマイズ（CfCT: Customizations for Control Tower）を実現するには、\nCloudFormation と Service Catalog を統合して、OU 全体に一元的に展開できる仕組みを構築します。\n各手順の意味\n選択肢内容理由AOrganizations で CloudFormation の 信頼されたアクセスを有効化CfCT が全アカウント/OU にテンプレートを自動デプロイできるようにする必須設定C各 CloudFormation テンプレートを Service Catalog 製品として登録Control Tower のアカウント作成・プロビジョニング時に、チームが選択・展開できるようにするECustomizations for Control Tower (CfCT) スタックをデプロイ実際に Control Tower 環境にカスタマイズを適用・配信する仕組みの本体\n❌ 不正解の理由\n**B AWSControlTowerBlueprintAccess ロールは存在せず、誤り。Service Catalog 管理ロール構成とは異なる。DCfCT では StackSets を手動作成しない。CfCT が自動で StackSets を管理。Fテンプレートは確かに作成するが、**C（Service Catalog 製品化）**の方が要件に直結しており、F単独では不十分。\n✅ 結論：\nA（信頼アクセス）＋C（Service Catalog 製品）＋E（CfCTデプロイ）\n＝ AWS Control Tower に統合された OU ベースのカスタマイズ提供構成が完成。",
+      "explanation": "✅ 正解：A・C・E\n💡 シンプル解説\nAWS Control Tower でカスタマイズ（CfCT: Customizations for Control Tower）を実現するには、\nCloudFormation と Service Catalog を統合して、OU 全体に一元的に展開できる仕組みを構築します。\n各手順の意味\nAOrganizations で CloudFormation の 信頼されたアクセスを有効化CfCT が全アカウント/OU にテンプレートを自動デプロイできるようにする必須設定\nC各 CloudFormation テンプレートを Service Catalog 製品として登録Control Tower のアカウント作成・プロビジョニング時に、チームが選択・展開できるようにする\nECustomizations for Control Tower (CfCT) スタックをデプロイ実際に Control Tower 環境にカスタマイズを適用・配信する仕組みの本体\n❌ 不正解の理由\n**B AWSControlTowerBlueprintAccess ロールは存在せず、誤り。Service Catalog 管理ロール構成とは異なる。DCfCT では StackSets を手動作成しない。CfCT が自動で StackSets を管理。Fテンプレートは確かに作成するが、**C（Service Catalog 製品化）**の方が要件に直結しており、F単独では不十分。\n✅ 結論：\nA（信頼アクセス）＋C（Service Catalog 製品）＋E（CfCTデプロイ）\n＝ AWS Control Tower に統合された OU ベースのカスタマイズ提供構成が完成。",
       "referenceLinks": [],
       "tags": []
     },
@@ -5439,13 +5439,13 @@
           "isCorrect": true
         }
       ],
-      "explanation": "D\nCodeBuildのレポートグループ（buildspecのreports:）でレポートのパス/形式を指定。\n保管先のS3バケットを用意し、CodeBuildの**出力（アーティファクト or レポートのS3エクスポート）**をそのバケットへ。\nS3に**ライフサイクルルール（有効期限90日）**を設定して自動削除。\n追加のLambdaや余計なパイプライン段は不要。最小構成で要件（可視化＋90日保管）を満たせます。",
+      "explanation": "答え：D\n要件を満たすには、CodeBuild の「テストレポート機能（レポートグループ）」と S3 のライフサイクル管理を素直に使うのが一番シンプルです。\nD が正解な理由\nD. CodeBuild プロジェクトのビルドスペックファイルに、レポートの適切なパスと形式を指定してレポートグループを追加します。レポートを保存するための Amazon S3 バケットを作成します。CodeBuild プロジェクトのビルドスペックファイルで、レポートグループをアーティファクトとして設定します。アーティファクトの保存先として S3 バケットを設定します。オブジェクトの有効期限を 90 日に設定します。\nこの流れだと：\nbuildspec.yml でレポートグループを定義\nreports: セクションで、\nテストレポートのパス（JUnit XML など）\n形式（JUnit, Cucumber 等）\nを指定。\nS3 バケットにレポートを保存するよう設定\nCodeBuild アーティファクトの出力先を S3 にすることで\nテストレポートが S3 に保存される。\nS3 のライフサイクルルールで 90 日後に自動削除\nバケット/プレフィックスに対して「有効期限 90 日」を設定すれば\nテストレポートは自動で 90 日保存 → その後削除。\n→ これで「テストレポートを 90 日間保管する」要件を 最小構成で 満たせます。\n他の選択肢が微妙なポイント\nA：\nCodePipeline に S3 デプロイアクションを追加する案だけど、\nテストレポートは CodeBuild 側で自然に扱えるのに、\nわざわざ CodePipeline に別ステージを足して転送するのは冗長。\nB：\nCodeBuild レポートグループ＋S3 までは良いが、\nそこからさらに EventBridge で Lambda を起動してコピー というのは完全にオーバーエンジニアリング。\n単にアーティファクトを S3 に直接置いてライフサイクル管理すれば良い。\nC：\nCodePipeline の「テストアクションタイプ」と buildspec 内で「レポートの有効期限を 90 日に設定」とあるが、\nCodeBuild のレポート有効期限を buildspec 側だけで 90 日に設定する、というような仕様はなく、\n実際の保持期間の制御は S3 ライフサイクル等で行うのが一般的。\nなので、要件とシンプルさの観点から、正解は D です。",
       "referenceLinks": [],
       "tags": []
     },
     {
       "id": "DOP-C02-Q172",
-      "questionText": "ある企業は、Amazon API Gateway のリージョン REST API を使用してアプリケーション API をホストしています。REST API にはカスタムドメインがあり、REST API のデフォルトエンドポイントは無効化されて\nいます。この API は社内のチームによって使用されています。この企業は、認証レイヤーの追加として、API と社内チーム間の相互 TLS を使用したいと考えています。\nこれらの要件を満たす手順の組み合わせはどれですか（2 つ選択してください）。",
+      "questionText": "ある企業は、Amazon API Gateway のリージョン REST API を使用してアプリケーション API をホストしています。REST API にはカスタムドメインがあり、REST API のデフォルトエンドポイントは無効化されています。この API は社内のチームによって使用されています。この企業は、認証レイヤーの追加として、API と社内チーム間の相互 TLS を使用したいと考えています。\nこれらの要件を満たす手順の組み合わせはどれですか（2 つ選択してください）。",
       "isMultiAnswer": true,
       "choices": [
         {
@@ -6416,10 +6416,10 @@
         {
           "id": "E",
           "text": "Amazon RDS Proxy を使用して Aurora データベースのプロキシを作成します。Lambda 関数を更新し、データベース接続にプロキシエンドポイントを使用するようにします。",
-          "isCorrect": false
+          "isCorrect": true
         }
       ],
-      "explanation": "A・B・F が適切です。\nA. 予約同時実行を増やす：関数の同時実行枠を確保し、販売イベントの突発的なスパイクでもスロット不足で詰まらないようにする。\nB. プロビジョンド同時実行を高める：あらかじめウォームな実行環境を用意でき、初期化遅延（コールドスタート）を抑制。\nF. RDS Proxy を利用：コネクションプーリングで Lambda からの大量接続確立コストを削減し、接続上限・スロット消費を緩和。\n※ D は「初期化コードをハンドラー内に移動」で逆効果（毎回の呼び出しで接続確立）、\n※ C はグローバル冗長/リージョン間レイテンシ対策向けで、今回の接続確立遅延の主因には不適。",
+      "explanation": "答え：A・B・E\nそれぞれ、どうスケーラビリティとレイテンシ改善に効くか整理します。\nA. Lambda 関数の予約同時実行性を高く設定\n予約同時実行 (Reserved Concurrency) を設定すると、その Lambda 関数が\nその数までは確実にスケールできる「枠」を確保できます。\n同じアカウント内の他の Lambda によって同時実行上限が使い切られてしまい、\nこのアプリケーションの Lambda がスケールできない、といった事態を防げます。\n→ 販売イベントなどのピークトラフィック時にも、十分な同時実行数でスケール可能になります。\nB. Lambda 関数に対して、より高いプロビジョンド同時実行性を設定\nプロビジョンド同時実行 (Provisioned Concurrency) は、あらかじめ\n一定数の Lambda 実行環境を「ウォーム状態」で用意しておく機能です。\n負荷がドッと来た瞬間でも、すでに起動済みの環境があるので\nコールドスタートによるレイテンシ増加を大きく抑えられます。\n→ 「リクエストが最初に集中したときのレイテンシ」を減らす、まさにどんぴしゃの対策です。\nE. Amazon RDS Proxy を使用し、Lambda からは Proxy エンドポイントに接続\n問題文にある通り、「呼び出し時間の大部分は DB 接続の確立」にかかっています。\nRDS Proxy を使うと：\nデータベース接続を プール して再利用\nLambda の急激なスケールアウト時でも、\nAurora DB に対する接続数のスパイクを吸収\nLambda 側からは短時間で接続でき、\n接続確立にかかる時間が大幅に短縮される\n→ Lambda のスケールアウトと Aurora の接続数をうまく仲介して、\nスケーラビリティとレイテンシ両方を改善できます。\nなぜ C / D は微妙か\nC. Aurora グローバルデータベース\nこれはマルチリージョンでの読み取り分散・DR 向けの仕組み。\n今回のボトルネックは「接続確立時間」であり、\nグローバル DB にしても接続時間の問題はほとんど解決しません。\nD. DB 接続初期化を関数ハンドラー内に移動\nベストプラクティスは 「ハンドラーの外側」で接続を初期化して再利用 することです。\nハンドラー内に移動すると、呼び出しごとに毎回接続を張り直すことになり、\n逆にレイテンシが増えます。\n以上から、\nアプリケーションに必要なスケーラビリティとレイテンシ改善を実現する組み合わせは\nA（予約同時実行）・B（プロビジョンド同時実行）・E（RDS Proxy）\nとなります。",
       "referenceLinks": [],
       "tags": []
     },
@@ -7200,7 +7200,7 @@
     },
     {
       "id": "DOP-C02-Q226",
-      "questionText": "ある会社が AWS CodeDeploy を使用してソフトウェアのデプロイを自動化しています。デプロイ\nでは、次の要件を満たす必要があります。 • デプロイ中にトラフィックを処理できるインスタンスが複数必要です。トラフィックはこれらのインスタンス間で分散され、障害発生時にはインスタンスが自動的に修復される必要があります。 • 手動によるプロビジョニングなしで、新しいリビジョンを自動的にデプロイするために、新しいインスタンス群を起動する必要があります。\n• トラフィックは、一度に新しいインスタンスの半数に再ルーティングする必要があります。トラフィックが少なくとも半数のインスタンスに再ルーティングされればデプロイは成功し、そうでない場合は失敗します。\n• トラフィックを新しいインスタンス群にルーティングする前に、デプロイプロセス中に生成された一時ファイルを削除する必要があります。\n• デプロイが成功したら、コストを削減するために、デプロイグループ内の元のインスタンスをすぐに削除する必要があります。\nDevOps エンジニアは、これらの要件をどのように満たすことができますか?",
+      "questionText": "ある会社が AWS CodeDeploy を使用してソフトウェアのデプロイを自動化しています。デプロイ\nでは、次の要件を満たす必要があります。 \n• デプロイ中にトラフィックを処理できるインスタンスが複数必要です。トラフィックはこれらのインスタンス間で分散され、障害発生時にはインスタンスが自動的に修復される必要があります。\n• 手動によるプロビジョニングなしで、新しいリビジョンを自動的にデプロイするために、新しいインスタンス群を起動する必要があります。\n• トラフィックは、一度に新しいインスタンスの半数に再ルーティングする必要があります。トラフィックが少なくとも半数のインスタンスに再ルーティングされればデプロイは成功し、そうでない場合は失敗します。\n• トラフィックを新しいインスタンス群にルーティングする前に、デプロイプロセス中に生成された一時ファイルを削除する必要があります。\n• デプロイが成功したら、コストを削減するために、デプロイグループ内の元のインスタンスをすぐに削除する必要があります。\nDevOps エンジニアは、これらの要件をどのように満たすことができますか?",
       "isMultiAnswer": false,
       "choices": [
         {
@@ -8655,7 +8655,7 @@
         },
         {
           "id": "B",
-          "text": " IAM チーム用の新しい AWS アカウントを作成します。Organizations の管理アカウントで、IAM Identity Center を有効にします。Organizations の管理アカウントで、新しいアカウントを IAM Identity Center の委任管理者として登録します。",
+          "text": "IAM チーム用の新しい AWS アカウントを作成します。Organizations の管理アカウントで、IAM Identity Center を有効にします。Organizations の管理アカウントで、新しいアカウントを IAM Identity Center の委任管理者として登録します。",
           "isCorrect": true
         },
         {
@@ -9049,7 +9049,7 @@
           "isCorrect": true
         }
       ],
-      "explanation": "正解：D\n理由\n目的は「CloudWatch Logsのデータを、専用アカウントのS3に継続的に集約」。\nこれには各アカウントのロググループ →（サブスクリプションフィルタ）→ Kinesis Data Firehose → S3 の経路が一般解。\nさらに今後作成されるロググループにも自動で適用する必要があるため、CreateLogGroup イベントで Lambda を起動し、PutSubscriptionFilter を実行してサブスクリプションを付与する設計が適合します。\n専用アカウント側にはLogs の宛先（Destination）とFirehose デリバリーストリーム、および**クロスアカウント許可（Destination のリソースポリシー / Firehose のロール / S3 バケットポリシー）**を設定します。\nなぜ A～C は不適合？\nA/B/C（AWS Backup系）：AWS Backup のバックアップ先はBackup Vaultであり、指定のS3バケットへログを直接送る仕組みではない。継続的なログ転送・ストリーミング用途にも不向き。将来作成されるロググループへの自動サブスクリプション付与もカバーできません。\nしたがって、既存・将来の全ロググループをカバーしつつ、専用アカウントのS3へ集約する設計は D だけです。",
+      "explanation": "答え：D\n要件を整理すると：\nすべてのアカウントの CloudWatch Logs を専用アカウントの S3 バケットへ集約したい\n既存のロググループだけでなく、今後新しく作られるロググループも自動で対象にしたい\nこれを満たすのが D の構成です。\nD の構成ポイント\n専用アカウントに CloudWatch Logs の送信先 (Destination) を作成\nその送信先のターゲットとして Kinesis Data Firehose 配信ストリームを設定\nFirehose の出力先として 専用アカウント内の S3 バケットを指定\n→ これで「ログ → Logs サブスクリプション → Firehose → S3」の経路ができる\nすべての既存ロググループに対して サブスクリプションフィルターを作成し、\n上記 Logs Destination / Firehose に送信\nさらに、\nCreateLogGroup イベントをトリガーにする EventBridge ルール\nそのルールから呼び出される Lambda 関数が PutSubscriptionFilter を実行\n→ 新しいロググループが作られるたびに、自動で同じ送信先へのサブスクリプションフィルターが設定される\nこれにより、\n既存＋今後作成される すべての CloudWatch Logs ロググループのデータを、専用アカウントの S3 バケットに集約できるので、要件を完全に満たします。\n他の選択肢が不適な理由（ざっくり）\nA / B / C：\nいずれも AWS Backup / backup ポリシーベースの案ですが、\nCloudWatch Logs の「リアルタイム/継続的なログ転送」ではなく「バックアップイメージ」を取る発想\nBackup Vault と S3 バケットは別物であり、「専用 S3 バケットにログを送る」という要件とズレている\nしたがって、正解は D です。\n",
       "referenceLinks": [],
       "tags": []
     },
@@ -9061,7 +9061,7 @@
         {
           "id": "A",
           "text": "Amazon CloudWatch エージェントをコンテナサイドカーとしてデプロイします。CloudWatch エージェントを設定して、ポート 9404 から JVM メトリクスを取得します。JVM スレッド数メトリクスに CloudWatch アラームを作成し、アプリケーションをスケールします。Fargate にステップスケーリングポリシーを追加し、CloudWatch アラームに基づいてスケールアップおよびスケールダウンします。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "B",
@@ -9071,7 +9071,7 @@
         {
           "id": "C",
           "text": "Amazon Managed Service for Prometheus ワークスペースを作成します。AWS Distro for OpenTelemetry をコンテナサイドカーとしてデプロイし、ポート 9404 から JVM メトリクスを Prometheus ワークスペースに公開します。ワークスペースのルールを設定し、JVM スレッド数メトリクスを使用してアプリケーションをスケーリングします。Fargate にステップスケーリングポリシーを追加します。スケールアップとスケールダウンに使用する Prometheus ルールを選択します。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "D",
@@ -9079,7 +9079,7 @@
           "isCorrect": true
         }
       ],
-      "explanation": "✅ 正解：C と D\n■ 理由と構成のポイント\n背景\nFargate 上で動作する ECS サービスに対し、自動スケーリングを追加する要件。\nスケーリング指標は JVM スレッド数（＝カスタムメトリクス）。\nすでに JVM メトリクスをポート 9404 で Prometheus 形式で公開している。\n→ つまり Prometheus メトリクスをそのまま活用する構成が最もシンプル。\n✅ C. Managed Service for Prometheus + ADOT + ステップスケーリング\nADOT（AWS Distro for OpenTelemetry）サイドカーを使用して、JVM メトリクス（:9404）を収集し、\nAmazon Managed Service for Prometheus (AMP) に送信。\nPrometheus ワークスペースで アラートルールを設定して、特定のスレッド数を超えたら\nCloudWatch アラームに転送し、自動スケーリングポリシー（ステップスケーリング）を実行。\nCloudWatch 連携を自動で行えるため、手動のメトリクス転送設定は不要。\n🟢 特徴\nJVMメトリクス形式（Prometheusフォーマット）をそのまま活用\nCloudWatch エージェント不要\nAMP→CloudWatch→Application Auto Scaling のルートがサポート済み\nステップスケーリング（明確な閾値制御）に適する\n✅ D. Managed Service for Prometheus + ADOT + ターゲット追跡ポリシー\n同様に AMP + ADOT によって JVM メトリクスを取得。\n今度はスケーリング方式を ターゲット追跡ポリシー（例：スレッド数平均が80を維持）とする。\nより運用オーバーヘッドが少なく、CloudWatch連携なしでシンプルな自動調整が可能。\n🟢 特徴\nメトリクスをスケールターゲットとして直接指定可能（Fargate のターゲット追跡）\n管理や閾値調整が容易（自動で適正値に追従）\nスケーリング挙動が安定しやすい\n❌ なぜ A / B は不適切か\n選択肢\t問題点\nA\tCloudWatch エージェント経由でJVMメトリクス収集 → CloudWatchに送信 → アラーム → スケーリング。設定は可能だが、Prometheus形式のメトリクスをCloudWatchに変換・管理する運用負担が大きい。\nB\tCloudWatch Logs + メトリクスフィルターを使う構成はログ解析ベースでありリアルタイム性が低く、管理オーバーヘッドが大きい。またスケールターゲットに直接指定するには追加の変換が必要。\n🧩 結論\nPrometheus 形式の JVM メトリクスを持つ Fargate アプリケーションで、\n最小の運用負担でスケーリングを実現する最適解は：\n✅ C. AMP + ADOT + ステップスケーリング\n✅ D. AMP + ADOT + ターゲット追跡スケーリング",
+      "explanation": "答え：A と D\nA. CloudWatch エージェント（Prometheus対応）＋ CloudWatch アラーム＋ステップスケーリング\nFargate タスクに CloudWatch エージェントをサイドカーとして入れ、\nポート 9404 の JVM メトリクスをスクレイプして CloudWatch カスタムメトリクスとして送信。\nその中の「JVM スレッド数」メトリクスに対して CloudWatch アラームを作成。\nECS サービス（Fargate）に ステップスケーリングポリシーを設定して、\nそのアラームに応じてタスク数を増減。\n→ CloudWatch + ECS Service Auto Scaling の 標準的な構成で、追加部品も少なく運用オーバーヘッドが小さい。\nD. Amazon Managed Service for Prometheus（AMP）＋ ADOT サイドカー＋ターゲット追跡スケーリング\nAmazon Managed Service for Prometheus ワークスペースを作成。\nAWS Distro for OpenTelemetry（ADOT） をサイドカーとしてデプロイし、\nポート 9404 から JVM メトリクスを取得して AMP に送信。\nECS/Fargate のオートスケーリングに ターゲット追跡ポリシーを設定し、\nPrometheus メトリクスを直接スケールターゲットとして指定。\n→ Prometheus ベースのメトリクスをそのままスケーリングに利用でき、\nCloudWatch アラームを個別に作って管理する必要がなく、\nメトリクス駆動のスケーリングをシンプルに運用できる。\n他の選択肢がダメな理由（ざっくり）\nB：ログ → メトリクスフィルタ → メトリクス という経路は遠回りで、\nCloudWatch エージェントはメトリクスを直接送れるのに、わざわざ Logs＋フィルタを挟んでおり、\nオペレーションが複雑になる。\nC：Prometheus の「ルール」をそのままステップスケーリングに使う、という形は想定されておらず、\nAMP 連携では ターゲット追跡で Prometheus メトリクスを使うのが筋。\nその意味で C の構成は不自然かつ運用負荷も高い。\nなので、このシナリオで\n「要件を満たし、かつ運用オーバーヘッドが最も少ない」のは A と D になります。",
       "referenceLinks": [],
       "tags": []
     },
@@ -9551,12 +9551,12 @@
         {
           "id": "A",
           "text": "CloudWatch エージェントを Kubernetes StatefulSet として EKS クラスターにデプロイします。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "B",
           "text": "AWS Distro for OpenTelemetry Collector を Kubernetes DaemonSet として EKS クラスターにデプロイします。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "C",
@@ -9571,12 +9571,12 @@
         {
           "id": "E",
           "text": "EKS クラスターの IAM OpenID Connect (OIDC) プロバイダーを構成します。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "F",
           "text": "EKS クラスターの EKS コントロール プレーン ログ記録を有効にします。",
-          "isCorrect": true
+          "isCorrect": false
         }
       ],
       "explanation": "正解：B・C・E\nB. ADOT Collector を DaemonSet としてデプロイ\nEKS ワークロードのメトリクス／ログ／トレースを収集し、CloudWatch（Container Insights など）へ送信する標準。Fargate では DaemonSet は実行されませんが、選択肢の中では CloudWatch エージェントより ADOT が適切です（実運用ではサイドカー方式を用います）。\nE. EKS の OIDC プロバイダーを構成\nIRSA（IAM Roles for Service Accounts） を使う前提。Pod 単位で最小権限を付与する基盤。\nC. サービスアカウントに IAM ロールを関連付け、CloudWatchAgentServerPolicy を付与\n収集用Pod（ADOT/エージェント）へ必要最小限の権限を付与。AdminPolicy は過剰なので不採用（Dは×）。\n不採用\nA：CloudWatch エージェントを StatefulSet は不適切（構成パターンとしても非推奨、Fargate とも相性が悪い）。\nD：最小権限の要件に反する（AdminPolicy）。\nF：コントロールプレーンログは有用だが、アプリの遅延解析（Pod/アプリのメトリクス・トレース収集）に直接必要な3手順の枠外。",
@@ -10550,7 +10550,7 @@
     },
     {
       "id": "DOP-C02-Q329",
-      "questionText": "ある企業はAWS Organizationsを使用しており、以下の要件を満たすガバナンス戦略を実装したいと考えています。 •\nAWSリソースへのアクセスは、すべてのアカウントで同じ2つのリージョンに制限されています。\n• AWSサービスは、すべてのアカウントで特定の承認済みサービスグル​​ープに制限されています。\n• 認証はActive Directoryによって提供されます。\n• アクセス権限は職務別に整理されており、各アカウントで同一です。\nこれらの要件を満たすソリューションはどれでしょうか？",
+      "questionText": "ある企業はAWS Organizationsを使用しており、以下の要件を満たすガバナンス戦略を実装したいと考えています。\n• AWSリソースへのアクセスは、すべてのアカウントで同じ2つのリージョンに制限されています。\n• AWSサービスは、すべてのアカウントで特定の承認済みサービスグル​​ープに制限されています。\n• 認証はActive Directoryによって提供されます。\n• アクセス権限は職務別に整理されており、各アカウントで同一です。\nこれらの要件を満たすソリューションはどれでしょうか？",
       "isMultiAnswer": false,
       "choices": [
         {
@@ -11481,7 +11481,7 @@
     {
       "id": "DOP-C02-Q359",
       "questionText": "ある企業は、Amazon EC2 Auto Scaling グループに属する Amazon EC2 インスタンスでアプリケーションを実行しています。EC2 インスタンスは、Application Load Balancer (ALB) の背後にあります。最近、一部の EC2 インスタンスにトラフィックが送信された際に、エラーが発生し始めました。DevOps\nエンジニアは、Auto Scaling グループが、アプリケーションエラーが発生しているにもかかわらず、問題のあるインスタンスは正常であると報告していることを発見しました。DevOps エンジニアが問題のあるインスタンスのアプリケーションエラーを解決すると、ユーザーエクスペリエンスは正常に戻ります。同社\nは、アプリケーションエラーが発生していない正常なインスタンスにのみトラフィックがルーティングされるようにしたいと考えています。また、トラフィックルーティング構成が変更された場合に、サポートチームに通知が届くようにしたいと考えています。\nこれらの要件を満たすソリューションはどれでしょうか？",
-      "isMultiAnswer": true,
+      "isMultiAnswer": false,
       "choices": [
         {
           "id": "A",
@@ -12309,7 +12309,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "A が最適です。\n同一リージョン内の高可用性: RDS for SQL Server を Multi-AZ で運用すれば、同期複製＋自動フェイルオーバーで RTO は概ね 60–120 秒、RPO は 0（同期）を狙えます。\nAWS Documentation\n+1\nリージョン間DR: RDS for SQL Server は クロスリージョン・リードレプリカをサポート。障害時に **昇格（Promote）**し、Route 53 の CNAME をスタンバイに切替える設計が推奨されています（RPO は非同期複製のため数十秒～程度、要監視）。\nAmazon Web Services, Inc.\n+2\nAWS Documentation\n+2\nB はスナップショットの 5 分間隔・迅速復元が現実的でなく RPO/RTO を満たしにくい、C はシングルAZでリージョン内 HA を満たさない、D は 30 秒間隔のバックアップが不可能です。",
+      "explanation": "正解は A です。\n要件を整理すると：\nRPO < 1分（ほぼリアルタイムでのデータ保護）\nRTO < 10分\n同一リージョン内の高可用性（インスタンス障害など）\nリージョン間の高可用性（リージョン障害を想定）\nフェイルオーバ時は、Route 53 の CNAME で接続先を切り替える\n各選択肢を見ていくと：\nA. マルチAZ DB クラスター + クロスリージョンリードレプリカ\n同一リージョン内\nMulti-AZ DB クラスターにより、リージョン内で自動フェイルオーバが行われ、高可用性を確保。\n別リージョン\nクロスリージョンリードレプリカはほぼリアルタイムでレプリケーションされるため、RPO < 1分を十分狙える。\nフェイルオーバ時には自動化（Lambda など）でリードレプリカを昇格\nRoute 53 の CNAME を新しいプライマリに更新\n→ スクリプト次第ですが、RTO < 10分も現実的。\n要件（RPO/RTO、リージョン内＆リージョン間HA）をすべて満たしているのはこれだけです。\nB. マルチAZ + 5分ごとのスナップショットコピー\nスナップショットは5分ごとなので、理論上の RPO は最大5分 → 「1分未満」条件を満たせない。\nスナップショットからの復元は数分〜十数分かかることもあり、RTO < 10分もかなり怪しい。\nよって要件 NG。\nC. シングルAZ + DMSでクロスリージョンレプリケーション\nプライマリが シングルAZ なので、リージョン内の高可用性がない（AZ障害で即アウト）。\nDMS によるレプリケーションで RPO は悪くないが、「リージョン内HA」が要件を満たさないので NG。\nD. シングルAZ + AWS Backup を 30秒ごと\nまず、AWS Backup を30秒ごとという前提自体が非現実的。\nそれ以前に、これもシングルAZなのでリージョン内 HA を満たせない。\nバックアップからの復元もスナップショット同様に時間がかかるので、RTO/RPO要件的にも厳しい。\nまとめ\nリージョン内 HA → RDS Multi-AZ DB クラスター\nリージョン間 HA + RPO<1分 → クロスリージョンリードレプリカ（ほぼリアルタイム）\nフェイルオーバ時 → 自動化でレプリカ昇格 + Route 53 CNAME 更新\n以上から、A が唯一、要件をすべて満たす選択肢です。\n",
       "referenceLinks": [],
       "tags": []
     },
@@ -12476,6 +12476,6 @@
   ],
   "meta": {
     "totalQuestions": 390,
-    "lastUpdatedAt": "2025-01-01"
+    "lastUpdatedAt": "2025-11-01"
   }
 }

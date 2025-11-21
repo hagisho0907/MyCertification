@@ -4,25 +4,47 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import examData from '@/app/data/aws-devops-pro.json'
 import SessionHistoryList from '@/components/SessionHistoryList'
-import { getExamProgress, removeSessionFromHistory, saveExamProgress } from '@/lib/progress'
+import {
+  getExamProgress,
+  getProgressWithRemote,
+  removeSessionFromHistory,
+  saveExamProgress,
+} from '@/lib/progress'
 import { ExamProgress } from '@/lib/types'
 
 export default function HistoryPage() {
   const router = useRouter()
   const [examProgress, setExamProgress] = useState<ExamProgress | null>(null)
   const [draftHistory, setDraftHistory] = useState<ExamProgress | null>(null)
+  const [isHydrating, setHydrating] = useState(true)
 
   useEffect(() => {
-    const progress = getExamProgress(examData.examId)
-    if (!progress) {
-      router.push('/')
-      return
+    let cancelled = false
+    const hydrate = async () => {
+      let progress = getExamProgress(examData.examId)
+      if (!progress) {
+        router.push('/')
+        return
+      }
+      if (!cancelled) {
+        setExamProgress(progress)
+        setDraftHistory(progress)
+      }
+
+      const synced = await getProgressWithRemote(examData.examId, examData.version)
+      if (!cancelled) {
+        setExamProgress(synced)
+        setDraftHistory(synced)
+        setHydrating(false)
+      }
     }
-    setExamProgress(progress)
-    setDraftHistory(progress)
+    hydrate()
+    return () => {
+      cancelled = true
+    }
   }, [router])
 
-  if (!examProgress || !draftHistory) {
+  if (!examProgress || !draftHistory || isHydrating) {
     return null
   }
 

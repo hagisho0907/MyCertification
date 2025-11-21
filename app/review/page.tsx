@@ -4,26 +4,50 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import examData from '@/app/data/aws-devops-pro.json'
 import QuestionCard from '@/components/QuestionCard'
-import { getExamProgress, getReviewQuestionIds, ensureActiveSession, saveExamProgress } from '@/lib/progress'
+import {
+  getExamProgress,
+  getReviewQuestionIds,
+  ensureActiveSession,
+  saveExamProgress,
+  getProgressWithRemote,
+} from '@/lib/progress'
 import { ExamProgress, Question } from '@/lib/types'
 
 export default function ReviewPage() {
   const router = useRouter()
   const [examProgress, setExamProgress] = useState<ExamProgress | null>(null)
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([])
+  const [isHydrating, setHydrating] = useState(true)
   
   useEffect(() => {
-    let progress = getExamProgress(examData.examId)
-    if (!progress) {
-      router.push('/')
-      return
+    let cancelled = false
+    const hydrate = async () => {
+      let progress = getExamProgress(examData.examId)
+      if (!progress) {
+        router.push('/')
+        return
+      }
+      if (!progress.currentSession) {
+        progress = ensureActiveSession(progress)
+        saveExamProgress(progress)
+      }
+      if (!cancelled) setExamProgress(progress)
+
+      const synced = await getProgressWithRemote(examData.examId, examData.version)
+      let nextProgress = synced
+      if (!nextProgress.currentSession) {
+        nextProgress = ensureActiveSession(nextProgress)
+        saveExamProgress(nextProgress)
+      }
+      if (!cancelled) {
+        setExamProgress(nextProgress)
+        setHydrating(false)
+      }
     }
-    if (!progress.currentSession) {
-      progress = ensureActiveSession(progress)
-      saveExamProgress(progress)
+    hydrate()
+    return () => {
+      cancelled = true
     }
-    setExamProgress(progress)
-    
   }, [router])
 
   useEffect(() => {
@@ -35,7 +59,7 @@ export default function ReviewPage() {
     setReviewQuestions(questionsToReview)
   }, [examProgress])
 
-  if (!examProgress) return null
+  if (!examProgress || isHydrating) return null
 
   if (reviewQuestions.length === 0) {
     return (

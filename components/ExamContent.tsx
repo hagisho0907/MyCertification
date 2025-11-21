@@ -7,6 +7,7 @@ import QuestionCard from '@/components/QuestionCard'
 import ProgressSummary from '@/components/ProgressSummary'
 import {
   getExamProgress,
+  getProgressWithRemote,
   createInitialProgress,
   startNewSession,
   completeCurrentSession,
@@ -25,13 +26,32 @@ export default function ExamContent() {
   
   const [examProgress, setExamProgress] = useState<ExamProgress | null>(null)
   const [isPageSynced, setPageSynced] = useState(false)
+  const [isHydrating, setHydrating] = useState(true)
 
   useEffect(() => {
-    let progress = getExamProgress(examData.examId)
-    if (!progress || progress.version !== examData.version) {
-      progress = createInitialProgress(examData.examId, examData.version)
+    let cancelled = false
+    const hydrate = async () => {
+      // まずローカルを即座に反映
+      let progress = getExamProgress(examData.examId)
+      if (!progress || progress.version !== examData.version) {
+        progress = createInitialProgress(examData.examId, examData.version)
+        saveExamProgress(progress)
+      }
+      if (!cancelled) {
+        setExamProgress(progress)
+      }
+
+      // リモートと突き合わせて最新を採用
+      const synced = await getProgressWithRemote(examData.examId, examData.version)
+      if (!cancelled) {
+        setExamProgress(synced)
+        setHydrating(false)
+      }
     }
-    setExamProgress(progress)
+    hydrate()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -94,7 +114,7 @@ export default function ExamContent() {
     router.push('/')
   }
 
-  if (!examProgress) return null
+  if (!examProgress || isHydrating) return null
 
   const currentSessionNumber = examProgress.currentSession?.sessionNumber ?? examProgress.nextSessionNumber
   const currentSessionStats = calculateSessionStats(

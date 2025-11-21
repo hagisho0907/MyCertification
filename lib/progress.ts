@@ -6,8 +6,30 @@ import {
   SessionQuestionProgress,
   CumulativeQuestionProgress,
 } from './types'
+import {
+  fetchRemoteExamProgress,
+  pushRemoteExamProgress,
+  pickLatestProgress,
+} from './progress-remote'
 
 const STORAGE_KEY_PREFIX = 'mycert-progress-'
+const SYNC_DEBOUNCE_MS = 800
+
+const pendingSync = new Map<string, ExamProgress>()
+let syncTimer: ReturnType<typeof setTimeout> | null = null
+
+const scheduleRemoteSync = (progress: ExamProgress) => {
+  pendingSync.set(progress.examId, progress)
+  if (syncTimer) clearTimeout(syncTimer)
+  syncTimer = setTimeout(async () => {
+    const items = Array.from(pendingSync.values())
+    pendingSync.clear()
+    syncTimer = null
+    for (const item of items) {
+      await pushRemoteExamProgress(item)
+    }
+  }, SYNC_DEBOUNCE_MS)
+}
 
 const isoNow = () => new Date().toISOString()
 
@@ -76,6 +98,8 @@ export function saveExamProgress(progress: ExamProgress): void {
     `${STORAGE_KEY_PREFIX}${progress.examId}`,
     JSON.stringify(progress)
   )
+  // リモートへの同期は非同期でデバウンス
+  scheduleRemoteSync(progress)
 }
 
 export function createInitialProgress(examId: string, version: string): ExamProgress {
@@ -89,6 +113,40 @@ export function createInitialProgress(examId: string, version: string): ExamProg
     sessionHistory: [],
     cumulative: {},
   }
+}
+
+export async function getProgressWithRemote(
+  examId: string,
+  version: string
+): Promise<ExamProgress> {
+  const local = getExamProgress(examId)
+
+  // version 不一致の場合はローカルをリセット
+  const base =
+    !local || local.version !== version ? createInitialProgress(examId, version) : local
+
+  let chosen = base
+
+  try {
+    const remote = await fetchRemoteExamProgress(examId)
+    // Remote が別バージョンなら破棄
+    const normalizedRemote = remote && remote.version === version ? remote : null
+
+    const latest = pickLatestProgress(base, normalizedRemote)
+    if (latest) {
+      chosen = latest
+    }
+
+    // Remote が無い場合は chosen をアップロード
+    if (!normalizedRemote) {
+      await pushRemoteExamProgress(chosen)
+    }
+  } catch (err) {
+    console.error('[progress] getProgressWithRemote failed', err)
+  }
+
+  saveExamProgress(chosen)
+  return chosen
 }
 
 export function startNewSession(progress: ExamProgress): ExamProgress {
