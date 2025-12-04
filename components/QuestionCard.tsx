@@ -6,9 +6,10 @@ import {
   updateQuestionProgress,
   saveExamProgress,
   setReviewFlag,
+  setFlagLevel,
 } from '@/lib/progress'
-import { CheckCircleIcon, XCircleIcon, FlagIcon } from '@heroicons/react/24/solid'
-import { FlagIcon as FlagOutlineIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
+import MultiLevelFlag from '@/components/MultiLevelFlag'
 
 interface QuestionCardProps {
   question: Question
@@ -31,6 +32,7 @@ export default function QuestionCard({
   const sessionQuestion = examProgress.currentSession?.questions[question.id]
   const cumulativeQuestion = examProgress.cumulative[question.id]
   const isFlagged = cumulativeQuestion?.isFlaggedForReview || false
+  const flagLevel = cumulativeQuestion?.flagLevel ?? 0
   const attempts = sessionQuestion?.attempts ?? 0
   const latestResult = sessionQuestion?.lastResult
 
@@ -80,8 +82,8 @@ export default function QuestionCard({
     onProgressUpdate(updatedProgress)
   }
 
-  const toggleFlag = () => {
-    const updatedProgress = setReviewFlag(examProgress, question.id, !isFlagged)
+  const handleFlagLevelChange = (newLevel: number) => {
+    const updatedProgress = setFlagLevel(examProgress, question.id, newLevel)
     saveExamProgress(updatedProgress)
     onProgressUpdate(updatedProgress)
   }
@@ -106,17 +108,12 @@ export default function QuestionCard({
             </p>
           )}
         </div>
-        <button
-          onClick={toggleFlag}
-          className="text-orange-500 hover:text-orange-600"
-          title={isFlagged ? '復習フラグを外す' : '復習フラグを付ける'}
-        >
-          {isFlagged ? (
-            <FlagIcon className="w-6 h-6" />
-          ) : (
-            <FlagOutlineIcon className="w-6 h-6" />
-          )}
-        </button>
+        <MultiLevelFlag
+          flagLevel={flagLevel}
+          onFlagLevelChange={handleFlagLevelChange}
+          size="lg"
+          showTooltip={true}
+        />
       </div>
       
       <div className="mb-4">

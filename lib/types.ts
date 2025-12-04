@@ -47,7 +47,8 @@ export type CumulativeQuestionProgress = {
   lastAnsweredAt?: string
   totalAttempts: number
   totalCorrect: number
-  isFlaggedForReview: boolean
+  isFlaggedForReview: boolean // 後方互換性のため保持
+  flagLevel: number // 0-5: フラグの重要度レベル (0=フラグなし, 1-5=重要度)
 }
 
 export type ExamProgress = {

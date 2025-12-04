@@ -39,6 +39,7 @@ const createEmptyCumulative = (): CumulativeQuestionProgress => ({
   totalAttempts: 0,
   totalCorrect: 0,
   isFlaggedForReview: false,
+  flagLevel: 0,
 })
 
 const cloneSessionWithQuestion = (
@@ -75,6 +76,18 @@ const isProgressV2 = (data: unknown): data is ExamProgress => {
   )
 }
 
+// 既存データのマイグレーション関数
+function migrateLegacyProgress(progress: any): ExamProgress {
+  if (progress.cumulative) {
+    Object.values(progress.cumulative).forEach((cumulativeProgress: any) => {
+      if (cumulativeProgress.flagLevel === undefined) {
+        cumulativeProgress.flagLevel = cumulativeProgress.isFlaggedForReview ? 1 : 0
+      }
+    })
+  }
+  return progress as ExamProgress
+}
+
 export function getExamProgress(examId: string): ExamProgress | null {
   if (typeof window === 'undefined') return null
 
@@ -86,7 +99,8 @@ export function getExamProgress(examId: string): ExamProgress | null {
     if (!isProgressV2(parsed)) {
       return null
     }
-    return parsed as ExamProgress
+    // 既存データのマイグレーション
+    return migrateLegacyProgress(parsed)
   } catch {
     return null
   }
@@ -258,6 +272,7 @@ export function updateQuestionProgress(
         : result === 'incorrect'
         ? true
         : existingCumulative.isFlaggedForReview,
+    flagLevel: existingCumulative.flagLevel ?? 0, // 後方互換性のため既存のflagLevelを保持
   }
 
   return {
@@ -313,6 +328,32 @@ export function setReviewFlag(
         totalAttempts: existing.totalAttempts,
         totalCorrect: existing.totalCorrect,
         isFlaggedForReview: isFlagged,
+        flagLevel: existing.flagLevel ?? 0,
+      },
+    },
+  }
+}
+
+export function setFlagLevel(
+  examProgress: ExamProgress,
+  questionId: string,
+  flagLevel: number
+): ExamProgress {
+  const now = isoNow()
+  const existing = examProgress.cumulative[questionId] ?? createEmptyCumulative()
+  return {
+    ...examProgress,
+    updatedAt: now,
+    cumulative: {
+      ...examProgress.cumulative,
+      [questionId]: {
+        ...existing,
+        lastResult: existing.lastResult,
+        lastAnsweredAt: existing.lastAnsweredAt,
+        totalAttempts: existing.totalAttempts,
+        totalCorrect: existing.totalCorrect,
+        isFlaggedForReview: flagLevel > 0, // フラグレベルが0より大きければフラグ付きとみなす
+        flagLevel: Math.max(0, Math.min(5, flagLevel)), // 0-5の範囲に制限
       },
     },
   }
@@ -397,7 +438,11 @@ export function clearExamProgress(examId: string): void {
 
 export function getReviewQuestionIds(progress: ExamProgress): string[] {
   return Object.entries(progress.cumulative)
-    .filter(([_, value]) => value.isFlaggedForReview || value.lastResult === 'incorrect')
+    .filter(([_, value]) => 
+      value.isFlaggedForReview || 
+      value.lastResult === 'incorrect' || 
+      (value.flagLevel && value.flagLevel > 0)
+    )
     .map(([questionId]) => questionId)
 }
 

@@ -61,6 +61,7 @@ export default function EnhancedPagination({
       let answered = 0
       let correct = 0
       let hasIncorrect = false
+      let maxFlagLevel = 0
 
       for (let i = startIndex; i < endIndex; i++) {
         const questionId = `DOP-C02-Q${String(i + 1).padStart(3, '0')}`
@@ -73,6 +74,11 @@ export default function EnhancedPagination({
           } else if (progress.lastResult === 'incorrect') {
             hasIncorrect = true
           }
+          
+          // フラグレベルも考慮
+          if (progress.flagLevel && progress.flagLevel > maxFlagLevel) {
+            maxFlagLevel = progress.flagLevel
+          }
         }
       }
 
@@ -81,6 +87,7 @@ export default function EnhancedPagination({
         correct,
         total: pageQuestionCount,
         hasIncorrect,
+        maxFlagLevel,
       }
     }
 
@@ -133,7 +140,7 @@ export default function EnhancedPagination({
   }, [currentPage, totalPages])
 
   const getPageButtonStyle = (page: number) => {
-    const stats = pageStats[page]
+    const stats = pageStats[page] as any
     const isCurrent = page === currentPage
     
     let baseClasses = 'relative inline-flex items-center justify-center w-10 h-10 text-sm font-medium border transition-colors'
@@ -142,6 +149,12 @@ export default function EnhancedPagination({
       baseClasses += ' z-10 bg-blue-600 border-blue-600 text-white'
     } else if (stats?.hasIncorrect) {
       baseClasses += ' bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+    } else if (stats?.maxFlagLevel >= 4) {
+      // 高フラグレベル（4-5）は紫色で表示
+      baseClasses += ' bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'
+    } else if (stats?.maxFlagLevel >= 2) {
+      // 中フラグレベル（2-3）はオレンジ色で表示
+      baseClasses += ' bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100'
     } else if (stats?.answered === stats?.total && stats?.total > 0) {
       baseClasses += ' bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
     } else if (stats && stats.answered > 0) {
@@ -154,10 +167,10 @@ export default function EnhancedPagination({
   }
 
   const getPageTooltip = (page: number) => {
-    const stats = pageStats[page]
+    const stats = pageStats[page] as any
     if (!stats) return `ページ ${page}`
     
-    const { answered, correct, total, hasIncorrect } = stats
+    const { answered, correct, total, hasIncorrect, maxFlagLevel } = stats
     const startQ = ((page - 1) * questionsPerPage) + 1
     const endQ = Math.min(page * questionsPerPage, totalQuestions)
     
@@ -170,13 +183,22 @@ export default function EnhancedPagination({
     
     if (hasIncorrect) {
       status = '要復習'
+    } else if (maxFlagLevel >= 4) {
+      status = '超重要フラグ'
+    } else if (maxFlagLevel >= 2) {
+      status = '重要フラグ'
     } else if (answered === total) {
       status = '完了'
     } else {
       status = '一部回答済み'
     }
     
-    return `ページ ${page} (${startQ}-${endQ}問) - ${status} ${answered}/${total}回答 正答率${percentage}%`
+    let tooltip = `ページ ${page} (${startQ}-${endQ}問) - ${status} ${answered}/${total}回答 正答率${percentage}%`
+    if (maxFlagLevel > 0) {
+      tooltip += ` 最高フラグLv.${maxFlagLevel}`
+    }
+    
+    return tooltip
   }
 
   return (
@@ -191,6 +213,8 @@ export default function EnhancedPagination({
             ← → キーでページ移動 | 
             <span className="inline-block w-3 h-3 bg-green-100 border border-green-200 rounded mx-1"></span>完了 
             <span className="inline-block w-3 h-3 bg-yellow-100 border border-yellow-200 rounded mx-1"></span>一部回答 
+            <span className="inline-block w-3 h-3 bg-orange-100 border border-orange-200 rounded mx-1"></span>重要フラグ 
+            <span className="inline-block w-3 h-3 bg-purple-100 border border-purple-200 rounded mx-1"></span>超重要フラグ 
             <span className="inline-block w-3 h-3 bg-red-100 border border-red-200 rounded mx-1"></span>要復習
           </div>
         </div>
