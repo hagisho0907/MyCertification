@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useMemo } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import examData from '@/app/data/aws-devops-pro.json'
 import QuestionCard from '@/components/QuestionCard'
+import EnhancedPagination from '@/components/EnhancedPagination'
 import {
   getExamProgress,
   getReviewQuestionIds,
@@ -13,8 +14,13 @@ import {
 } from '@/lib/progress'
 import { ExamProgress, Question } from '@/lib/types'
 
+const QUESTIONS_PER_PAGE = 10
+
 export default function ReviewPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const page = parseInt(searchParams.get('page') || '1')
+  
   const [examProgress, setExamProgress] = useState<ExamProgress | null>(null)
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([])
   const [isHydrating, setHydrating] = useState(true)
@@ -58,6 +64,19 @@ export default function ReviewPage() {
     )
     setReviewQuestions(questionsToReview)
   }, [examProgress])
+
+  // ページネーション用の計算
+  const paginatedQuestions = useMemo(() => {
+    const startIndex = (page - 1) * QUESTIONS_PER_PAGE
+    const endIndex = startIndex + QUESTIONS_PER_PAGE
+    return reviewQuestions.slice(startIndex, endIndex)
+  }, [reviewQuestions, page])
+
+  const totalPages = Math.ceil(reviewQuestions.length / QUESTIONS_PER_PAGE)
+
+  const handlePageChange = (newPage: number) => {
+    router.push(`/review?page=${newPage}`)
+  }
 
   if (!examProgress || isHydrating) return null
 
@@ -109,8 +128,22 @@ export default function ReviewPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mb-6">
+            <EnhancedPagination
+              currentPage={page}
+              totalPages={totalPages}
+              questionsPerPage={QUESTIONS_PER_PAGE}
+              onPageChange={handlePageChange}
+              examProgress={examProgress}
+              totalQuestions={reviewQuestions.length}
+            />
+          </div>
+        )}
+
         <div className="space-y-6">
-          {reviewQuestions.map((question, index) => {
+          {paginatedQuestions.map((question, index) => {
             const questionNumber = examData.questions.findIndex(q => q.id === question.id) + 1
             return (
               <QuestionCard
@@ -123,6 +156,20 @@ export default function ReviewPage() {
             )
           })}
         </div>
+
+        {/* Bottom pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8">
+            <EnhancedPagination
+              currentPage={page}
+              totalPages={totalPages}
+              questionsPerPage={QUESTIONS_PER_PAGE}
+              onPageChange={handlePageChange}
+              examProgress={examProgress}
+              totalQuestions={reviewQuestions.length}
+            />
+          </div>
+        )}
       </main>
     </div>
   )

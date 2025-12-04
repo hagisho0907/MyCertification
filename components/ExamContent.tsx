@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import examData from '@/app/data/aws-devops-pro.json'
 import QuestionCard from '@/components/QuestionCard'
 import ProgressSummary from '@/components/ProgressSummary'
+import EnhancedPagination from '@/components/EnhancedPagination'
 import {
   getExamProgress,
   getProgressWithRemote,
@@ -222,16 +223,16 @@ export default function ExamContent() {
 
         {examProgress.currentSession && (
           <>
-            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-sm text-gray-600">
-                ページ {page} / {totalPages} （{startIndex + 1}〜{endIndex} 問目）
-              </span>
-              <button
-                onClick={handleCompleteSession}
-                className="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors w-full sm:w-auto text-center"
-              >
-                セッションを終了する
-              </button>
+            {/* Top pagination */}
+            <div className="mb-6">
+              <EnhancedPagination
+                currentPage={page}
+                totalPages={totalPages}
+                questionsPerPage={QUESTIONS_PER_PAGE}
+                onPageChange={handlePageChange}
+                examProgress={examProgress}
+                totalQuestions={examData.questions.length}
+              />
             </div>
 
             <div className="space-y-4">
@@ -246,34 +247,34 @@ export default function ExamContent() {
               ))}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium text-sm hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto text-center"
-              >
-                前の20問
-              </button>
-              
-              <div className="text-sm text-gray-600 text-center">
-                {page} / {totalPages}
-              </div>
-              
-              {page < totalPages ? (
-                <button
-                  onClick={() => handlePageChange(page + 1)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors w-full sm:w-auto text-center"
-                >
-                  次の20問
-                </button>
-              ) : (
+            {/* Enhanced Pagination */}
+            <div className="mt-6">
+              <EnhancedPagination
+                currentPage={page}
+                totalPages={totalPages}
+                questionsPerPage={QUESTIONS_PER_PAGE}
+                onPageChange={handlePageChange}
+                examProgress={examProgress}
+                totalQuestions={examData.questions.length}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              {page === totalPages && (
                 <button
                   onClick={handleFinishLearning}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 transition-colors w-full sm:w-auto text-center"
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 transition-colors w-full sm:w-auto text-center"
                 >
                   学習を終了する
                 </button>
               )}
+              <button
+                onClick={handleCompleteSession}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-300 transition-colors w-full sm:w-auto text-center"
+              >
+                セッションを終了する
+              </button>
             </div>
           </>
         )}
