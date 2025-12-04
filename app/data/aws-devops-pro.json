@@ -1,11 +1,11 @@
 {
   "examId": "aws-devops-pro",
   "title": "AWS Certified DevOps Engineer - Professional",
-  "version": "2025-12",
+  "version": "2025-11",
   "questions": [
     {
       "id": "DOP-C02-Q001",
-      "questionText": "【2025/12/4更新】\nある企業には、Application Load Balancer (ALB) への HTTP API 呼び出しを行うモバイルアプリケーションがあります。ALB はリクエストを AWS Lambda 関数にルーティングします。特定の時点では、一部のユーザーによってテストされているバージョンも含め、アプリケーションのさまざまなバージョンが使用されています。アプリケーションのバージョンは、API へのすべてのリクエストと共に送信されるユーザーエージェントヘッダーで定義されます。 最近 API に一連の変更が加えられた後、企業はアプリケーションに問題があることを確認しました。企業は、使用中のアプリケーションのバージョンごとに、レスポンスコードによって各 API 操作のメトリクスを収集する必要があります。DevOps エンジニアは、ユーザーエージェントヘッダーとレスポンスコードから API 操作名、バージョン情報を抽出するために Lambda 関数を変更しました。必要 なメトリクスを収集するために、DevOps エンジニアはどのような追加のアクションセットを実行する必要がありますか?",
+      "questionText": "【2025/12/5更新】ある企業には、Application Load Balancer (ALB) への HTTP API 呼び出しを行うモバイルアプリケーションがあります。ALB はリクエストを AWS Lambda 関数にルーティングします。特定の時点では、一部のユーザーによってテストされているバージョンも含め、アプリケーションのさまざまなバージョンが使用されています。アプリケーションのバージョンは、API へのすべてのリクエストと共に送信されるユーザーエージェントヘッダーで定義されます。 最近 API に一連の変更が加えられた後、企業はアプリケーションに問題があることを確認しました。企業は、使用中のアプリケーションのバージョンごとに、レスポンスコードによって各 API 操作のメトリクスを収集する必要があります。DevOps エンジニアは、ユーザーエージェントヘッダーとレスポンスコードから API 操作名、バージョン情報を抽出するために Lambda 関数を変更しました。必要 なメトリクスを収集するために、DevOps エンジニアはどのような追加のアクションセットを実行する必要がありますか?",
       "isMultiAnswer": false,
       "choices": [
         {
@@ -176,12 +176,12 @@
         {
           "id": "C",
           "text": "ソースアカウントで、ターゲットアカウントの Auto Scaling グループのサービスにリンクされたロールに権限を委任する KMS 付与を作成します。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "D",
           "text": "ソースアカウントでキーポリシーを変更し、ターゲットアカウントに権限付与を作成する権限を付与します。ターゲットアカウントで、Auto Scaling グループのサービスにリンクされたロールに権限を委任する KMS 権限付与を作成します。",
-          "isCorrect": false
+          "isCorrect": true
         },
         {
           "id": "E",
@@ -194,7 +194,7 @@
           "isCorrect": true
         }
       ],
-      "explanation": "正解は A・C・F です。\n\nA. ソースアカウントで、暗号化されていないAMIを暗号化されたAMIにコピーする（KMSキーを指定）\n\n\nもともとのカスタムAMIは暗号化されていないので、そのままでは要件「共有するすべてのAMIを暗号化」に違反。\n\n\nソースアカウントで AMI をコピーする際に、作成済みのカスタマー管理KMSキーを指定してコピーすることで、\n→ 暗号化されたAMI（および暗号化スナップショット）が作られる。\nこれは必須ステップ。\n\n\n\nC. ソースアカウントで、ターゲットアカウントの ASG サービスリンクロールに権限を委任する KMS Grant を作成\n\n\nターゲットアカウントの Auto Scaling グループが、ソースアカウントの KMSキーで暗号化されたスナップショットから EC2 を起動するには、\n\n\nその ASG のサービスリンクロールが、ソースアカウントの KMS キーを Decrypt / CreateGrant などで利用できる必要がある。\n\n\n\n\nそのために、ソースアカウント側で KMS Grant を作成し、\n「グランティ（grantee）」をターゲットアカウントの ASG サービスリンクロールにする、というのが正しいやり方の一つ。\n\n\nこれでターゲット側の ASG が、ソース側の CMK で暗号化された AMI／スナップショットを使ってインスタンスを起動できる。\n\n\n\nF. ソースアカウントで、暗号化されたAMIをターゲットアカウントと共有する\n\n\n暗号化済みAMI（とそのスナップショット）をターゲットアカウントと共有しないと、\n\n\nターゲット側の Auto Scaling グループは、その AMI を参照してインスタンスを起動できない。\n\n\n\n\nしたがって、コピーして暗号化した AMI を launchPermission でターゲットアカウントに付与する必要がある。\n\n\n\nなぜ B / D / E は違うか\n\n\nB. デフォルトのEBS暗号化キーを指定\n\n\nAWS管理キー（aws/ebs）はアカウント間共有に向かない（ポリシー編集できないため、他アカウントからの利用許可を柔軟に付与できない）。\n\n\n問題文でも「KMSキーを作成している」とあるので、カスタマー管理キーを使うべき。よって不適。\n\n\n\n\nD. ターゲットアカウントに Grant 作成権限を渡し、ターゲット側で Grant を作成\n\n\nこれでも技術的には可能だが、「追加で必要な手順」としては遠回りで、\nソースアカウント側で直接 Grant を作成する C の方がシンプルで一般的。\n\n\n典型解としては C を選び D は選ばないパターン。\n\n\n\n\nE. 暗号化されていないAMIを共有\n\n\n要件「共有するすべてのAMIを暗号化」に明確に違反するため NG。\n\n\n\n\n\nまとめると、\n\n\nA：まずソースで AMI をカスタマー管理KMSキーで暗号化コピー\n\n\nC：そのキーをターゲットの ASG ロールが使えるように KMS Grant を作成\n\n\nF：暗号化された AMI をターゲットアカウントと共有\n\n\nこの 3 つで要件を満たせます。\n",
+      "explanation": "解説なし",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"
@@ -782,7 +782,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "答え：B\n\n要件を整理すると：\n\n\nインスタンスが再起動されたときに S3 からメタデータを取得すること\n\n\nインスタンスが応答しなくなったら自動的に再起動 or 再作成されること\n\n\nこれを1つのソリューションで満たす必要があります。\nB が要件を満たす理由\nB. AWS OpsWorks を設定し、自動ヒーリング機能を使用してインスタンスを停止および起動します。OpsWorks のライフサイクルイベントを使用して、Amazon S3 からメタデータを取得し、インスタンス上で更新します。\n\n\nOpsWorks の 自動ヒーリング(auto healing) 機能で、インスタンスがヘルスチェックに失敗した場合に自動的に置き換え（実質再起動/再作成）される。\n\n\n新しく起動したインスタンスに対して、ライフサイクルイベント（setup / deploy など） で Chef レシピやスクリプトを動かし、\n\n\nその中で S3 からメタデータを取得してアプリに反映することができる。\n\n\n\n\nつまり、\n\n\n「死んだら自動復旧」＋「起動時にS3からメタデータ取得」\nを一連の仕組みとして実現できる。\n\n\n\n\n\n他の選択肢がダメなポイント\n\n\nA / C\n\n\nどちらも「S3イベント通知でインスタンスにプッシュ」とあるが、\nS3 イベントは「S3上のオブジェクト操作」をトリガーするもので、EC2の状態変化(再起動)に連動してプッシュする仕組みではない。\n\n\nまた Auto Recovery は「ハードウェア障害時の自動復旧」であって、「アプリがハングした」など論理的な無応答には十分ではない場合が多い。\n\n\n\n\nD\n\n\nUserData で S3 からメタデータ取得は「起動時にメタデータを読む」という要件の一部は満たすが、\n\n\nインスタンスが応答しなくなったときに自動で再起動/再作成する仕組みがない。\n\n\nCloudFormation 自体にはヘルスチェックによる自動ヒーリング機能はない。\n\n\n\n\n\n以上から、要求を単独で満たすのは B です。\n",
+      "explanation": "解説なし",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"
@@ -1820,7 +1820,7 @@
     },
     {
       "id": "DOP-C02-Q056",
-      "questionText": "DevOpsエンジニアは、AWS CodePipelineを使用して、以下の手順でWebサービスのデプロイを自動化しました。\n1. AWS CodeBuildプロジェクトがデプロイアーティファクトをコンパイルし、単体テストを実行します。\n2 .AWS CodeDeployデプロイグループが、ステージング環境のAmazon EC2インスタンスにWebサービスをデプロイします。\n3. CodeDeployデプロイグループが、本番環境のEC2インスタンスにWebサービスをデプロイします。\n品質保証（QA）チームは、本番環境へのデプロイ前にビルドアーティファクトを検査する権限を要求します。QAチームは、手動テストを実施するために、内部侵入テストツールを実行したいと考えています。このツールは、REST API呼び出しによって呼び出されます。\nこの要求を満たすために、DevOpsエンジニアはどのようなアクションの組み合わせを実行する必要がありますか？（2つ選択してください。）",
+      "questionText": "DevOpsエンジニアは、AWS CodePipelineを使用して、以下の手順でWebサービスのデプロイを自動化しました。\n1. AWS CodeBuildプロジェクトがデプロイアーティファクトをコンパイルし、単体テストを実行します。\n2 .AWS CodeDeployデプロイグループが、ステージング環境のAmazon EC2インスタンス\nにWebサービスをデプロイします。3. CodeDeployデプロイグループが、本番環境のEC2インスタンスにWebサービスをデプロイします。\n品質保証（QA）チームは、本番環境へのデプロイ前にビルドアーティファクトを検査する権限を要求します。QAチームは、手動テストを実施するために、内部侵入テストツールを実行したいと考えています。このツールは、REST API呼び出しによって呼び出されます。\nこの要求を満たすために、DevOpsエンジニアはどのようなアクションの組み合わせを実行する必要がありますか？（2つ選択してください。）",
       "isMultiAnswer": true,
       "choices": [
         {
@@ -2241,7 +2241,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "答え：B\n理由\nAPI Gatewayはステージのカナリアリリースをサポート、Lambdaはバージョン＋エイリアスで段階的トラフィック移行が可能（少数ユーザーで先行検証→昇格）。\n\n\nこれらをCloudFormationで宣言的に管理すれば、更新時に新バージョンをデプロイ→カナリア比率で配信→問題なければ昇格まで自動化できる。\n\n\nAのRoute 53フェイルオーバーはカナリア用途に不適、C/Dはサーバーレス構成にミスマッチ。\n\n",
+      "explanation": "答え：B\n理由\nAPI Gatewayはステージのカナリアリリースをサポート、Lambdaはバージョン＋エイリアスで段階的トラフィック移行が可能（少数ユーザーで先行検証→昇格）。\n\n\nこれらをCloudFormationで宣言的に管理すれば、更新時に新バージョンをデプロイ→カナリア比率で配信→問題なければ昇格まで自動化できる。\n\n\nAのRoute 53フェイルオーバーはカナリア用途に不適、C/Dはサーバーレス構成にミスマッチ。",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"
@@ -2736,7 +2736,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "正解は A と D です。\n\nA. ネットワーク構成により、EC2 インスタンスが CodeDeploy エンドポイントにアクセスできない\n\nCodeDeploy エージェントは、HTTPS(443) で CodeDeploy / S3 のエンドポイントにポーリングしに行きます。\nインスタンスが\n\nパブリックIPもNATゲートウェイもない\n\nセキュリティグループで 443 のアウトバウンドを塞いでいる\n\nVPC エンドポイントも用意していない\n\nなどで CodeDeploy や S3 に到達できない 場合、エージェントは指示やリビジョンを取得できず、結果として 全ライフサイクルイベントが Skipped になる典型パターン です。\nAWS ドキュメント\n\nD. 適切な権限を持つインスタンスプロファイルがターゲット EC2 インスタンスにアタッチされていない\n\nEC2 側には、少なくとも\n\nS3 からアプリケーションリビジョンを取得する権限\n\nCodeDeploy / CloudWatch Logs とやりとりする権限\n\nなどを含んだ IAM インスタンスプロファイル が必要です。\nこれが\n\n付いていない\n\n付いているが必要なポリシーがない\n\nと、CodeDeploy エージェントが S3 からリビジョンを取得できず、やはり 全イベントが Skipped になる原因として公式ドキュメントに挙げられています。\nAWS ドキュメント\n\nなぜ B / C / E は違うか\n\nB. IAM ユーザーの権限不足\nデプロイが開始されてデプロイメント ID まで発行されている時点で、「トリガーした IAM ユーザー」は必要な CodeDeploy API を実行できています。権限がなければそもそもデプロイ自体が作成されません。\n\nC. EC2 インスタンスが CodeDeploy エンドポイントに正しく登録されていない\n「登録」はオンプレミスインスタンスの概念で、EC2 の場合は タグや Auto Scaling グループでデプロイメントグループに含める だけです。「登録されていない」ならターゲットが 0 になり、挙動は問題文の「各インスタンスのイベントがすべて Skipped」とは少し違います。\n\nE. appspec.yml がリビジョンに含まれていない\nappspec.yml がない場合は、通常は AppSpec ファイルエラーとして即 Fail になります。「全イベント Skipped」ではなく、「AppSpec ファイルが見つからない」系の Failed になるので、状況と合いません。\n\nなので、このシナリオで「全イベントが Skipped になる正当な原因」として選ぶべきは A と D です。",
+      "explanation": "答え：C と D\n\nC. インスタンスが CodeDeploy へ正しく登録されていない\n対象インスタンスがデプロイメントグループに認識されていない（オフライン/未登録）場合、ライフサイクルイベントは Skipped となり、コードは配布されません。\n\nD. 適切な権限のインスタンスプロファイルが付与されていない\nCodeDeploy エージェントはインスタンスロールの権限で CodeDeploy/S3/CloudWatch へアクセスします。ロールが欠如/不十分だと登録や取得ができず、結果的に Skipped になります。\n\nA は原因になり得ますが（インターネット/VPC エンドポイント到達不可）、現象としては C の未登録として表れます。B は実行開始時点で権限エラーになり、E は appspec.yml 不在エラーで Skipped ではなく明示的な失敗になります。",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"
@@ -3647,7 +3647,7 @@
         {
           "id": "A",
           "text": "cfn-signal ヘルパースクリプトを使用して、CloudFormation に成功または失敗を通知します。CloudFormation テンプレート内で WaitOnResourceSignals 更新ポリシーを使用します。更新ポリシーに適切なタイムアウトを設定します。",
-          "isCorrect": true
+          "isCorrect": false
         },
         {
           "id": "B",
@@ -3662,7 +3662,7 @@
         {
           "id": "D",
           "text": "Amazon CloudWatchエージェントを使用して、cloud-initログをストリーミングします。適切な呼び出しタイムアウトを設定したAWS Lambda関数を含むサブスクリプションフィルターを作成します。Lambda関数がSignalResource APIオペレーションを使用してCloudFormationに成功または失敗を通知するように設定します。",
-          "isCorrect": false
+          "isCorrect": true
         }
       ],
       "explanation": "正解：A\n\n理由：\nユーザーデータ（cfn-init 等）完了可否を cfn-signal で CloudFormation に送信し、ASG（または対象リソース）に UpdatePolicy: AutoScalingRollingUpdate の WaitOnResourceSignals: true と Timeout を設定します。\n所定時間内に成功シグナルが届かなければ スタック更新を失敗としてロールバック します。",
@@ -3950,7 +3950,7 @@
         },
         {
           "id": "B",
-          "text": "カスタマー管理のKMSキーを作成します。KMSキーポリシーを設定し、CloudFormationアクションで使用されるIAMロールが復号化操作を実行できるようにします。パイプラインを変更し、カスタマー管理のKMSキーを使用してアーティファクトを暗号化します。",
+          "text": "カスタマー管理のKMSキーを作成します。KMSキーポリシーを設定し、CloudFormationアクションで使用されるIAMロールが復号化操作を実行できるようにします。パイプラインを変更し、カスタマー管理のKMSキーを使用してアーティファクトを暗号化します。 C. AWS 管理の KMS キーを作成します。開発アカウントと本番アカウントが復号化操作を実行できるように KMS キーポリシーを設定します。パイプラインを変更し、KMS キーを使用してアーティファクトを暗号化します。",
           "isCorrect": true
         },
         {
@@ -6224,12 +6224,12 @@
         },
         {
           "id": "E",
-          "text": "アカウントにSCPを添付します。以下の文言を含めます。\n{\n  \"Effect\": \"Deny\",\n  \"Action\": [\n    \"codecommit:GitPush\",\n    \"codecommit:PutFile\",\n    \"codecommit:Merge*\"\n  ],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"StringEqualsIfExists\": {\n      \"codecommit:References\": [\"refs/heads/main\"]\n    },\n    \"StringNotEquals\": {\n      \"aws:ResourceTag/access-team\": \"${aws:PrincipalTag/access-team}\"\n    },\n    \"Null\": {\n      \"codecommit:References\": \"false\"\n    }\n  }\n}\n",
+          "text": "アカウントにSCPを添付します。以下の文言を含めます。\n{\n  \"Effect\": \"Deny\",\n  \"Action\": [\n    \"codecommit:GitPush\",\n    \"codecommit:PutFile\",\n    \"codecommit:Merge*\"\n  ],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"StringEqualsIfExists\": {\n      \"codecommit:References\": [\"refs/heads/main\"]\n    },\n    \"StringNotEquals\": {\n      \"aws:ResourceTag/access-team\": \"${aws:PrincipalTag/access-team}\"\n    },\n    \"Null\": {\n      \"codecommit:References\": \"false\"\n    }\n  }\n}",
           "isCorrect": true
         },
         {
           "id": "F",
-          "text": "各アカウントにIAM権限境界を作成します。次のステートメントを含めます。\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\n    \"codecommit:GitPush\",\n    \"codecommit:PutFile\",\n    \"codecommit:Merge*\"\n  ],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"StringEqualsIfExists\": {\n      \"codecommit:References\": [\"refs/heads/main\"]\n    },\n    \"StringNotEquals\": {\n      \"aws:ResourceTag/access-team\": \"${aws:PrincipalTag/access-team}\"\n    },\n    \"Null\": {\n      \"codecommit:References\": \"false\"\n    }\n  }\n}\n",
+          "text": "各アカウントにIAM権限境界を作成します。次のステートメントを含めます。\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\n    \"codecommit:GitPush\",\n    \"codecommit:PutFile\",\n    \"codecommit:Merge*\"\n  ],\n  \"Resource\": \"*\",\n  \"Condition\": {\n    \"StringEqualsIfExists\": {\n      \"codecommit:References\": [\"refs/heads/main\"]\n    },\n    \"StringNotEquals\": {\n      \"aws:ResourceTag/access-team\": \"${aws:PrincipalTag/access-team}\"\n    },\n    \"Null\": {\n      \"codecommit:References\": \"false\"\n    }\n  }\n}",
           "isCorrect": false
         }
       ],
@@ -9329,7 +9329,7 @@
           "isCorrect": true
         }
       ],
-      "explanation": "答え：D\n\n要件を整理すると：\nすべてのアカウントの CloudWatch Logs を専用アカウントの S3 バケットへ集約したい\n既存のロググループだけでなく、今後新しく作られるロググループも自動で対象にしたい\nこれを満たすのが D の構成です。\n\nD の構成ポイント\n専用アカウントに CloudWatch Logs の送信先 (Destination) を作成\nその送信先のターゲットとして Kinesis Data Firehose 配信ストリームを設定\nFirehose の出力先として 専用アカウント内の S3 バケットを指定\n→ これで「ログ → Logs サブスクリプション → Firehose → S3」の経路ができる\nすべての既存ロググループに対して サブスクリプションフィルターを作成し、\n上記 Logs Destination / Firehose に送信\nさらに、\nCreateLogGroup イベントをトリガーにする EventBridge ルール\nそのルールから呼び出される Lambda 関数が PutSubscriptionFilter を実行\n→ 新しいロググループが作られるたびに、自動で同じ送信先へのサブスクリプションフィルターが設定される\nこれにより、\n既存＋今後作成される すべての CloudWatch Logs ロググループのデータを、専用アカウントの S3 バケットに集約できるので、要件を完全に満たします。\n\n他の選択肢が不適な理由（ざっくり）\nA / B / C：\nいずれも AWS Backup / backup ポリシーベースの案ですが、\nCloudWatch Logs の「リアルタイム/継続的なログ転送」ではなく「バックアップイメージ」を取る発想\nBackup Vault と S3 バケットは別物であり、「専用 S3 バケットにログを送る」という要件とズレている\nしたがって、正解は D です。\n",
+      "explanation": "答え：D\n\n要件を整理すると：\nすべてのアカウントの CloudWatch Logs を専用アカウントの S3 バケットへ集約したい\n既存のロググループだけでなく、今後新しく作られるロググループも自動で対象にしたい\nこれを満たすのが D の構成です。\n\nD の構成ポイント\n専用アカウントに CloudWatch Logs の送信先 (Destination) を作成\nその送信先のターゲットとして Kinesis Data Firehose 配信ストリームを設定\nFirehose の出力先として 専用アカウント内の S3 バケットを指定\n→ これで「ログ → Logs サブスクリプション → Firehose → S3」の経路ができる\nすべての既存ロググループに対して サブスクリプションフィルターを作成し、\n上記 Logs Destination / Firehose に送信\nさらに、\nCreateLogGroup イベントをトリガーにする EventBridge ルール\nそのルールから呼び出される Lambda 関数が PutSubscriptionFilter を実行\n→ 新しいロググループが作られるたびに、自動で同じ送信先へのサブスクリプションフィルターが設定される\nこれにより、\n既存＋今後作成される すべての CloudWatch Logs ロググループのデータを、専用アカウントの S3 バケットに集約できるので、要件を完全に満たします。\n\n他の選択肢が不適な理由（ざっくり）\nA / B / C：\nいずれも AWS Backup / backup ポリシーベースの案ですが、\nCloudWatch Logs の「リアルタイム/継続的なログ転送」ではなく「バックアップイメージ」を取る発想\nBackup Vault と S3 バケットは別物であり、「専用 S3 バケットにログを送る」という要件とズレている\nしたがって、正解は D です。",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"
@@ -9635,7 +9635,7 @@
         },
         {
           "id": "D",
-          "text": "\"Condition\": {\n    \"ForAllValues:StringEquals\": {\n        \"ec2:ResourceTag/department\": [\"d1\", \"d2\", \"d3\"]\n    }\n}\n",
+          "text": "\"Condition\": {\n    \"ForAllValues:StringEquals\": {\n        \"ec2:ResourceTag/department\": [\"d1\", \"d2\", \"d3\"]\n    }\n}",
           "isCorrect": false
         }
       ],
@@ -12693,7 +12693,7 @@
           "isCorrect": false
         }
       ],
-      "explanation": "正解は A です。\n\n要件を整理すると：\n\nRPO < 1分（ほぼリアルタイムでのデータ保護）\nRTO < 10分\n同一リージョン内の高可用性（インスタンス障害など）\nリージョン間の高可用性（リージョン障害を想定）\nフェイルオーバ時は、Route 53 の CNAME で接続先を切り替える\n\n各選択肢を見ていくと：\nA. マルチAZ DB クラスター + クロスリージョンリードレプリカ\n同一リージョン内\nMulti-AZ DB クラスターにより、リージョン内で自動フェイルオーバが行われ、高可用性を確保。\n別リージョン\nクロスリージョンリードレプリカはほぼリアルタイムでレプリケーションされるため、RPO < 1分を十分狙える。\nフェイルオーバ時には自動化（Lambda など）でリードレプリカを昇格\n\nRoute 53 の CNAME を新しいプライマリに更新\n→ スクリプト次第ですが、RTO < 10分も現実的。\n\n要件（RPO/RTO、リージョン内＆リージョン間HA）をすべて満たしているのはこれだけです。\n\nB. マルチAZ + 5分ごとのスナップショットコピー\nスナップショットは5分ごとなので、理論上の RPO は最大5分 → 「1分未満」条件を満たせない。\nスナップショットからの復元は数分〜十数分かかることもあり、RTO < 10分もかなり怪しい。\nよって要件 NG。\n\nC. シングルAZ + DMSでクロスリージョンレプリケーション\nプライマリが シングルAZ なので、リージョン内の高可用性がない（AZ障害で即アウト）。\nDMS によるレプリケーションで RPO は悪くないが、「リージョン内HA」が要件を満たさないので NG。\n\nD. シングルAZ + AWS Backup を 30秒ごと\nまず、AWS Backup を30秒ごとという前提自体が非現実的。\nそれ以前に、これもシングルAZなのでリージョン内 HA を満たせない。\n\n\nバックアップからの復元もスナップショット同様に時間がかかるので、RTO/RPO要件的にも厳しい。\n\n\n\nまとめ\n\n\nリージョン内 HA → RDS Multi-AZ DB クラスター\n\n\nリージョン間 HA + RPO<1分 → クロスリージョンリードレプリカ（ほぼリアルタイム）\n\n\nフェイルオーバ時 → 自動化でレプリカ昇格 + Route 53 CNAME 更新\n\n\n以上から、A が唯一、要件をすべて満たす選択肢です。\n",
+      "explanation": "正解は A です。\n\n要件を整理すると：\n\nRPO < 1分（ほぼリアルタイムでのデータ保護）\nRTO < 10分\n同一リージョン内の高可用性（インスタンス障害など）\nリージョン間の高可用性（リージョン障害を想定）\nフェイルオーバ時は、Route 53 の CNAME で接続先を切り替える\n\n各選択肢を見ていくと：\nA. マルチAZ DB クラスター + クロスリージョンリードレプリカ\n同一リージョン内\nMulti-AZ DB クラスターにより、リージョン内で自動フェイルオーバが行われ、高可用性を確保。\n別リージョン\nクロスリージョンリードレプリカはほぼリアルタイムでレプリケーションされるため、RPO < 1分を十分狙える。\nフェイルオーバ時には自動化（Lambda など）でリードレプリカを昇格\n\nRoute 53 の CNAME を新しいプライマリに更新\n→ スクリプト次第ですが、RTO < 10分も現実的。\n\n要件（RPO/RTO、リージョン内＆リージョン間HA）をすべて満たしているのはこれだけです。\n\nB. マルチAZ + 5分ごとのスナップショットコピー\nスナップショットは5分ごとなので、理論上の RPO は最大5分 → 「1分未満」条件を満たせない。\nスナップショットからの復元は数分〜十数分かかることもあり、RTO < 10分もかなり怪しい。\nよって要件 NG。\n\nC. シングルAZ + DMSでクロスリージョンレプリケーション\nプライマリが シングルAZ なので、リージョン内の高可用性がない（AZ障害で即アウト）。\nDMS によるレプリケーションで RPO は悪くないが、「リージョン内HA」が要件を満たさないので NG。\n\nD. シングルAZ + AWS Backup を 30秒ごと\nまず、AWS Backup を30秒ごとという前提自体が非現実的。\nそれ以前に、これもシングルAZなのでリージョン内 HA を満たせない。\n\n\nバックアップからの復元もスナップショット同様に時間がかかるので、RTO/RPO要件的にも厳しい。\n\n\n\nまとめ\n\n\nリージョン内 HA → RDS Multi-AZ DB クラスター\n\n\nリージョン間 HA + RPO<1分 → クロスリージョンリードレプリカ（ほぼリアルタイム）\n\n\nフェイルオーバ時 → 自動化でレプリカ昇格 + Route 53 CNAME 更新\n\n\n以上から、A が唯一、要件をすべて満たす選択肢です。",
       "referenceLinks": [],
       "tags": [],
       "lastReviewed": "2025-11-21"

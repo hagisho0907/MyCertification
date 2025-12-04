@@ -11,6 +11,7 @@ import {
   pushRemoteExamProgress,
   pickLatestProgress,
 } from './progress-remote'
+import { cacheProgressData } from './service-worker'
 
 const STORAGE_KEY_PREFIX = 'mycert-progress-'
 const SYNC_DEBOUNCE_MS = 800
@@ -98,6 +99,15 @@ export function saveExamProgress(progress: ExamProgress): void {
     `${STORAGE_KEY_PREFIX}${progress.examId}`,
     JSON.stringify(progress)
   )
+  
+  // Service Workerのキャッシュも更新
+  try {
+    const allProgress = { exams: { [progress.examId]: progress } }
+    cacheProgressData(allProgress)
+  } catch (error) {
+    console.warn('[progress] Failed to cache in service worker:', error)
+  }
+  
   // リモートへの同期は非同期でデバウンス
   scheduleRemoteSync(progress)
 }
@@ -119,30 +129,48 @@ export async function getProgressWithRemote(
   examId: string,
   version: string
 ): Promise<ExamProgress> {
-  const local = getExamProgress(examId)
+  let local = getExamProgress(examId)
 
   // version 不一致の場合はローカルをリセット
-  const base =
-    !local || local.version !== version ? createInitialProgress(examId, version) : local
+  if (local && local.version !== version) {
+    console.log(`[progress] Version mismatch: ${local.version} -> ${version}, resetting local`)
+    local = null
+  }
 
-  let chosen = base
+  let chosen: ExamProgress
 
   try {
     const remote = await fetchRemoteExamProgress(examId)
+    console.log(`[progress] Remote data fetched:`, remote ? 'found' : 'not found')
+    
     // Remote が別バージョンなら破棄
     const normalizedRemote = remote && remote.version === version ? remote : null
-
-    const latest = pickLatestProgress(base, normalizedRemote)
-    if (latest) {
-      chosen = latest
+    
+    if (normalizedRemote) {
+      console.log(`[progress] Valid remote data found`)
     }
 
-    // Remote が無い場合は chosen をアップロード
-    if (!normalizedRemote) {
+    // 優先順位: リモート（有効） > ローカル > 初期状態
+    if (normalizedRemote) {
+      chosen = normalizedRemote
+      console.log(`[progress] Using remote progress`)
+    } else if (local) {
+      chosen = local
+      console.log(`[progress] Using local progress`)
+    } else {
+      chosen = createInitialProgress(examId, version)
+      console.log(`[progress] Created initial progress`)
+    }
+
+    // Remote が無いか古い場合は chosen をアップロード
+    if (!normalizedRemote || (local && new Date(local.updatedAt) > new Date(normalizedRemote.updatedAt))) {
+      console.log(`[progress] Pushing progress to remote`)
       await pushRemoteExamProgress(chosen)
     }
   } catch (err) {
     console.error('[progress] getProgressWithRemote failed', err)
+    // リモート取得に失敗した場合はローカルまたは初期状態を使用
+    chosen = local || createInitialProgress(examId, version)
   }
 
   saveExamProgress(chosen)
