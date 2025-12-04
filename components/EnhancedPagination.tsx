@@ -51,6 +51,7 @@ export default function EnhancedPagination({
       correct: number
       total: number
       hasIncorrect: boolean
+      maxFlagLevel: number
     }> = {}
 
     for (let page = 1; page <= totalPages; page++) {
@@ -140,7 +141,7 @@ export default function EnhancedPagination({
   }, [currentPage, totalPages])
 
   const getPageButtonStyle = (page: number) => {
-    const stats = pageStats[page] as any
+    const stats = pageStats[page]
     const isCurrent = page === currentPage
     
     let baseClasses = 'relative inline-flex items-center justify-center w-10 h-10 text-sm font-medium border transition-colors'
@@ -167,7 +168,7 @@ export default function EnhancedPagination({
   }
 
   const getPageTooltip = (page: number) => {
-    const stats = pageStats[page] as any
+    const stats = pageStats[page]
     if (!stats) return `ページ ${page}`
     
     const { answered, correct, total, hasIncorrect, maxFlagLevel } = stats
