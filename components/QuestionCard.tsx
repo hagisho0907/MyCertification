@@ -191,23 +191,19 @@ export default function QuestionCard({
               <h4 className="font-semibold text-sm mb-1.5">解説</h4>
               <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{question.explanation}</p>
               
-              {question.referenceLinks.length > 0 && (
+              {question.referenceLinks && question.referenceLinks.trim() && (
                 <div className="mt-3">
                   <h5 className="font-medium text-xs text-gray-600 mb-1">参考リンク:</h5>
-                  <ul className="space-y-1 text-sm">
-                    {question.referenceLinks.map((link, index) => (
-                      <li key={index}>
-                        <a
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline text-sm"
-                        >
-                          {link}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="text-sm">
+                    <a
+                      href={question.referenceLinks}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      {question.referenceLinks}
+                    </a>
+                  </div>
                 </div>
               )}
             </div>

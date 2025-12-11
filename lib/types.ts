@@ -10,8 +10,9 @@ export type Question = {
   isMultiAnswer: boolean
   choices: Choice[]
   explanation: string
-  referenceLinks: string[]
-  tags: string[]
+  referenceLinks: string
+  tags: string
+  lastReviewed: string
 }
 
 export type ExamData = {
