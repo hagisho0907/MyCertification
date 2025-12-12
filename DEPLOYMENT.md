@@ -70,13 +70,23 @@ git push -u origin main
    git push
    ```
 
-### 4. 環境変数（必要な場合）
+### 4. 環境変数（Supabase 用）
 
-現在のアプリケーションは環境変数を使用していませんが、将来的に必要になった場合：
+学習進捗の同期先として Supabase を使います。
 
-1. Vercelダッシュボードでプロジェクトを開く
-2. 「Settings」→「Environment Variables」
-3. 必要な変数を追加
+1. Supabase でプロジェクトを作成し、SQL エディタで以下を実行してテーブルを用意
+   ```sql
+   create table if not exists exam_progress (
+     exam_id text primary key,
+     payload jsonb not null,
+     updated_at timestamptz not null default now()
+   );
+   alter table exam_progress enable row level security;
+   -- service role でのみ叩く想定なので追加ポリシーは不要
+   ```
+2. Vercel の「Settings」→「Environment Variables」で以下を設定（ローカルは `.env.local` にも同じ値を配置）
+   - `SUPABASE_URL`: Supabase プロジェクトの URL
+   - `SUPABASE_SERVICE_ROLE_KEY`: service role key（クライアントには公開しない）
 
 ### 5. カスタムドメイン（オプション）
 

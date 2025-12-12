@@ -1,102 +1,54 @@
 import { NextResponse } from 'next/server'
 import { ExamProgress } from '@/lib/types'
+import { getSupabaseServiceClient } from '@/lib/supabase'
 
-const GIST_FILENAME = 'progress.json'
+const TABLE = 'exam_progress'
 
 type StoredPayload = {
   exams: Record<string, ExamProgress>
 }
 
-const getEnv = () => {
-  const token = process.env.GITHUB_TOKEN
-  const gistId = process.env.GITHUB_GIST_ID
-  return { token, gistId }
+type ExamProgressRow = {
+  exam_id: string
+  payload: ExamProgress
+  updated_at: string | null
 }
 
-const githubHeaders = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  Accept: 'application/vnd.github+json',
-  'Content-Type': 'application/json',
-  'X-GitHub-Api-Version': '2022-11-28',
-})
-
-async function fetchGistContent(token: string, gistId: string): Promise<StoredPayload | null> {
-  const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-    headers: githubHeaders(token),
-    cache: 'no-store',
-  })
-
-  if (!res.ok) {
-    console.error('[progress] Failed to fetch gist', res.status, await res.text())
-    return null
-  }
-
-  const data = await res.json()
-  const file = data?.files?.[GIST_FILENAME]
-  if (!file?.content) return { exams: {} }
-
-  try {
-    const parsed = JSON.parse(file.content as string)
-    if (parsed && typeof parsed === 'object' && parsed.exams) {
-      return parsed as StoredPayload
-    }
-  } catch (err) {
-    console.error('[progress] Failed to parse gist JSON', err)
-  }
-  return { exams: {} }
-}
-
-async function updateGistContent(
-  token: string,
-  gistId: string,
-  payload: StoredPayload
-): Promise<boolean> {
-  const body = {
-    files: {
-      [GIST_FILENAME]: {
-        content: JSON.stringify(payload, null, 2),
-      },
-    },
-  }
-
-  const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-    method: 'PATCH',
-    headers: githubHeaders(token),
-    body: JSON.stringify(body),
-  })
-
-  if (!res.ok) {
-    console.error('[progress] Failed to update gist', res.status, await res.text())
-    return false
-  }
-  return true
-}
+const buildMissingConfigResponse = () =>
+  NextResponse.json(
+    { error: 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required' },
+    { status: 500 }
+  )
 
 export async function GET() {
-  const { token, gistId } = getEnv()
-  if (!token || !gistId) {
-    return NextResponse.json(
-      { error: 'GITHUB_TOKEN and GITHUB_GIST_ID are required' },
-      { status: 500 }
-    )
+  let supabase
+  try {
+    supabase = getSupabaseServiceClient()
+  } catch (err) {
+    console.error('[progress] Supabase client init failed', err)
+    return buildMissingConfigResponse()
   }
 
-  const payload = await fetchGistContent(token, gistId)
-  if (!payload) {
-    return NextResponse.json({ exams: {} }, { status: 200 })
+  const { data, error } = await supabase
+    .from<ExamProgressRow>(TABLE)
+    .select('exam_id,payload,updated_at')
+
+  if (error) {
+    console.error('[progress] Supabase fetch failed', error)
+    return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 502 })
   }
-  return NextResponse.json(payload, { status: 200 })
+
+  const exams = (data ?? []).reduce<StoredPayload['exams']>((acc, row) => {
+    if (row.exam_id && row.payload) {
+      acc[row.exam_id] = row.payload
+    }
+    return acc
+  }, {})
+
+  return NextResponse.json({ exams }, { status: 200 })
 }
 
 export async function PUT(req: Request) {
-  const { token, gistId } = getEnv()
-  if (!token || !gistId) {
-    return NextResponse.json(
-      { error: 'GITHUB_TOKEN and GITHUB_GIST_ID are required' },
-      { status: 500 }
-    )
-  }
-
   let incoming: ExamProgress | null = null
   try {
     const body = await req.json()
@@ -109,12 +61,27 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'examProgress is required' }, { status: 400 })
   }
 
-  const current = (await fetchGistContent(token, gistId)) ?? { exams: {} }
-  current.exams[incoming.examId] = incoming
+  let supabase
+  try {
+    supabase = getSupabaseServiceClient()
+  } catch (err) {
+    console.error('[progress] Supabase client init failed', err)
+    return buildMissingConfigResponse()
+  }
 
-  const ok = await updateGistContent(token, gistId, current)
-  if (!ok) {
-    return NextResponse.json({ error: 'Failed to update gist' }, { status: 502 })
+  const row: ExamProgressRow = {
+    exam_id: incoming.examId,
+    payload: incoming,
+    updated_at: new Date().toISOString(),
+  }
+
+  const { error } = await supabase.from<ExamProgressRow>(TABLE).upsert(row, {
+    onConflict: 'exam_id',
+  })
+
+  if (error) {
+    console.error('[progress] Supabase upsert failed', error)
+    return NextResponse.json({ error: 'Failed to update progress' }, { status: 502 })
   }
 
   return NextResponse.json({ ok: true }, { status: 200 })
