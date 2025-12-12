@@ -29,16 +29,15 @@ export async function GET() {
     return buildMissingConfigResponse()
   }
 
-  const { data, error } = await supabase
-    .from<ExamProgressRow>(TABLE)
-    .select('exam_id,payload,updated_at')
+  const { data, error } = await supabase.from(TABLE).select('exam_id,payload,updated_at')
 
   if (error) {
     console.error('[progress] Supabase fetch failed', error)
     return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 502 })
   }
 
-  const exams = (data ?? []).reduce<StoredPayload['exams']>((acc, row) => {
+  const rows = (data ?? []) as ExamProgressRow[]
+  const exams = rows.reduce<StoredPayload['exams']>((acc, row) => {
     if (row.exam_id && row.payload) {
       acc[row.exam_id] = row.payload
     }
@@ -75,9 +74,7 @@ export async function PUT(req: Request) {
     updated_at: new Date().toISOString(),
   }
 
-  const { error } = await supabase.from<ExamProgressRow>(TABLE).upsert(row, {
-    onConflict: 'exam_id',
-  })
+  const { error } = await supabase.from(TABLE).upsert(row, { onConflict: 'exam_id' })
 
   if (error) {
     console.error('[progress] Supabase upsert failed', error)
